@@ -1,0 +1,92 @@
+:root {
+  --hover-color: #f2f2f2;
+}
+.sidebarContainer {
+  max-width: 17rem;
+  width: 17rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  z-index: 999;
+  background-color: white;
+  border-right: 1px solid var(--hover-color);
+}
+
+ul {
+  padding: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logo {
+  font-family: 'Satisfy', cursive;
+  font-weight: 300;
+  font-style: normal;
+  font-size: 2.4rem;
+  display: flex;
+  justify-content: start;
+  padding: 10px;
+}
+
+.menuItem {
+  height: 50px;
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  padding-left: 5px;
+}
+
+.menuItem .icon * {
+  transition: transform 0.3s ease;
+}
+
+.menuItem:hover .icon * {
+  transform: scale(1.1);
+} 
+
+.menuItem:active .icon * {
+  transform: scale(0.95);
+}
+
+.menuItem:hover {
+  background-color: var(--hover-color);
+  cursor: pointer;
+  transition-duration: 500ms;
+}
+
+.link {
+  display: flex;
+  border-radius: 6px;
+  gap: 8px;
+  justify-items: start;
+  align-items: center;
+  font-weight: 400;
+  font-size: 1.05rem;
+}
+
+.linkActive {
+  display: flex;
+  border-radius: 6px;
+  gap: 8px;
+  justify-content: start;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.icon {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.close .icon {
+  display: flex;
+  justify-content: center;
+}

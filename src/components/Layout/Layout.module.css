@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.sidebar {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.content {
+    margin-left: 5rem;
+    padding: 1rem;
+    transition: width 0.3s ease;
+    background-color: aliceblue;
+    flex-grow: 1;
+    overflow-x: hidden;
+}
+.open {
+    margin-left: 17rem;
+    transition: 0.3s ease;
+}
