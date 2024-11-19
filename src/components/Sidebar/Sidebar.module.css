@@ -1,15 +1,12 @@
-:root {
-  --hover-color: #f2f2f2;
-}
 .sidebarContainer {
   max-width: 17rem;
   width: 17rem;
   height: 100vh;
   overflow: hidden;
   position: fixed;
-  z-index: 999;
+  z-index: 10;
   background-color: white;
-  border-right: 1px solid var(--hover-color);
+  border-right: 1px solid var(--grey-color3);
 }
 
 ul {
@@ -89,4 +86,8 @@ ul {
 .close .icon {
   display: flex;
   justify-content: center;
+}
+
+.iconActive {
+  border: 1px solid var(--hover-color);
 }

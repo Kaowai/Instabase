@@ -1,0 +1,44 @@
+h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    padding: 20px 20px 20px 20px;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.searchBar {
+    padding: 0 20px;
+}
+
+.historySearch > :first-child {
+    padding: 0 20px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.historySearch > :first-child > :first-child {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.historySearch > :first-child > :last-child {
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--primary-color1);
+}
+
+.historySearch > :first-child > :last-child:hover {
+    color: var(--primary-color3);
+}
+
+.listHistory {
+    display: flex;
+    flex-direction: column;
+}
+
+.divideVertical {
+    border-bottom: 1px solid var(--grey-color3);
+}

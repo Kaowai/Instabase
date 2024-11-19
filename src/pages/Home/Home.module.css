@@ -1,0 +1,72 @@
+.container {
+  display: grid;
+  grid-template-columns: 6.5fr 3.5fr;
+  grid-template-rows: 1fr; 
+  gap: 10px; 
+  width: 100%;
+  height: 100vh; 
+  grid-template-areas: "content personal";
+}
+.grid_column1,
+.grid_column2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  height: 100%;
+}
+
+.grid_column1 {
+  gap: 20px;
+  padding: 0 100px;
+  grid-area: content;
+}
+
+.grid_column2 {
+  color: white; 
+  grid-area: personal;
+  padding:  15px 50px 15px 0; 
+}
+
+.story {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    width: 100%;
+}
+
+.post {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recommendUser {
+    padding: 0;
+    width: 100%;
+}
+
+.divide {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 20px 5px;
+}
+
+.divide > span:first-child {
+    font-weight: 600;
+    color: var(--grey-color2);
+}
+
+.divide > span:last-child {
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--grey-color2)
+}
+
+.divide > span:last-child:hover {
+    color: var(--grey-color3);
+}

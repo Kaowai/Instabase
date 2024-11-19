@@ -1,0 +1,80 @@
+.container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1rem;
+    padding: 10px 20px;
+    height: 64px;
+}
+
+.container .content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.container > div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.container > button {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: transparent; /* Ensure the button blends in */
+}
+
+.imageSearch {
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    background-color: var(--hover-color);
+}
+
+.search {
+    height: 16px;
+    width: 16px;
+}
+
+.nameAccount {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.avatar_wrapper {
+    height: 46px;
+    width: 46px;
+    padding: 2px; /* Độ dày của viền */
+    border-radius: 50%; /* Bo tròn viền */
+    background-image: linear-gradient(90deg, #f9ce34, #ee2a7b, #6228d7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no_image {
+    height: 46px;
+    width: 46px;
+    padding: 2px; /* Độ dày của viền */
+    border-radius: 50%; /* Bo tròn viền */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: none;
+    background-color: var(--hover-color);
+}
+
+.containerImage {
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    width: 48px;
+}
+
+.infoAccount {
+    font-weight: 350;
+}

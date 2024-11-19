@@ -2,6 +2,7 @@
     display: flex;
     height: 100%;
     width: 100%;
+    position: relative;
 }
 
 .sidebar {
@@ -13,11 +14,29 @@
     margin-left: 5rem;
     padding: 1rem;
     transition: width 0.3s ease;
-    background-color: aliceblue;
     flex-grow: 1;
     overflow-x: hidden;
+    height: 100vh;
+    overflow-y:visible;
 }
 .open {
     margin-left: 17rem;
     transition: 0.3s ease;
+}
+
+.searchBar {
+    margin-left: 5rem;
+    height: 100vh;
+    position: fixed;
+    width: 28rem;
+    position: absolute;
+    z-index: 9;
+    color: black;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 8px;
+    border-right: 1px solid var(--grey-color3);
+    background-color: #fff;
+}
+.hide {
+    visibility: hidden;
 }

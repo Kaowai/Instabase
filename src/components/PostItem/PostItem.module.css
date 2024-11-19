@@ -1,0 +1,67 @@
+.containerItem {
+  width: 320px;
+  height: 320px;
+  position: relative;
+  background-color: bisque;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.containerItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Màu overlay */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.containerItem:hover::before {
+  opacity: 1;
+}
+
+.imageItem {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 0;
+}
+
+.react {
+  position: absolute; /* Đặt react ở vị trí tuyệt đối bên trong containerItem */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  visibility: hidden;
+}
+
+.containerItem:hover .react {
+  visibility: visible;
+}
+
+.comment > span {
+    color: white;
+}
+
+.comment > span:last-child {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.comment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-direction: row;
+}

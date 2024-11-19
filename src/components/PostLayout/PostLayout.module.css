@@ -1,0 +1,55 @@
+.container {
+    display: flex;
+    width: 500px;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.containerPost {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.containerPost img {
+    width: 500px;
+    border-radius: 8px;
+}
+
+.action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action .icon {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.likeamount > span,
+.nameAccount {
+    font-weight: 600;
+}
+.commentAmount > span {
+    cursor: pointer;
+    color: var(--grey-color2)
+}
+
+.comment > input {
+    outline: none;
+    border: none;
+    width: 100%;
+}
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.divideVertical {
+    border-bottom: 1px solid var(--grey-color3);
+}

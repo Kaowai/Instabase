@@ -185,7 +185,11 @@ const MenuItem = ({
   return (
     <li className={`${styles.menuItem} ${!isOpen && styles.close}`} onClick={onClick}>
       <div className={activeMenu === name ? styles.linkActive : styles.link}>
-        <div className={styles.icon}>{activeMenu === name ? icon[1] : icon[0]}</div>
+        <div
+          className={`${activeMenu === name && (name === 'Search' || name === 'Notifications') && styles.iconActive} ${styles.icon}`}
+        >
+          {activeMenu === name ? icon[1] : icon[0]}
+        </div>
         {isOpen && name}
       </div>
     </li>

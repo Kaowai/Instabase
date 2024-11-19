@@ -1,42 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Satisfy&display=swap');
 
-* {
-    font-family: "Inter", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 300;
-    font-size: 0.9rem;
-    color: black;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --hover-color: #f2f2f2;
+  --primary-color1: #37afe1;
+  --primary-color2: #4cc9fe;
+  --primary-color3: #789dbc;
+  --grey-color1: #bdbdbd;
+  --grey-color2: #848484;
+  --grey-color3: #dbdbdb;
 }
 
-
+* {
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 380;
+  font-size: 0.9rem;
+  color: black;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
 
 .material-symbols-sharp.filled {
   font-variation-settings:
-  'FILL' 1,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 40
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 40;
 }
 .md-32 {
   font-size: 28px;
 }
 
+.md-16 {
+  font-size: 16px;
+}
+
+.md-24 {
+  font-size: 24px;
+}
 .material-symbols-sharp.weight {
   font-variation-settings:
-  'FILL' 1,
-  'wght' 700,
-  'GRAD' 0,
-  'opsz' 40
+    'FILL' 1,
+    'wght' 700,
+    'GRAD' 0,
+    'opsz' 40;
 }
 
 .material-symbols-sharp {
   font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 40
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 40;
 }
