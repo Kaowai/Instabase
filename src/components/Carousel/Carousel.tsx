@@ -18,17 +18,27 @@ const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000
     }
   }, [autoSlide, autoSlideInterval])
 
+  const handleLoading = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const size = e.currentTarget
+    console.log(size.naturalWidth, size.naturalHeight)
+  }
+
   return (
-    <div className='overflow-hidden relative'>
-      <div className='border-[1px] border-black'>
-        <div
-          className='flex transition-transform ease-out duration-500'
-          style={{ transform: `translate(-${curr * 100}%)` }}
-        >
-          {images.map((src, index) => (
-            <img key={index} className='w-full h-[700px] object-cover bg-center' src={src} alt={`Slide ${index + 1}`} />
-          ))}
-        </div>
+    <div className='overflow-hidden relative box-border	'>
+      <div
+        className='flex box-border h-[680px] max-h-[680px] w-[700px] max-w-[780px] transition-transform ease-out duration-500'
+        style={{ transform: `translate(-${curr * 100}%)` }}
+      >
+        {images.map((src, index) => (
+          <img
+            key={index}
+            className='w-full h-full object-cover'
+            src={src}
+            onLoad={handleLoading}
+            loading='lazy'
+            alt={`Slide ${index + 1}`}
+          />
+        ))}
       </div>
       <div className={`absolute inset-0 items-center flex justify-between p-3 ${images.length === 0 && 'hidden'}`}>
         <button

@@ -1,42 +1,73 @@
 .container {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 
 .sidebar {
-    height: 100%;
-    transition: width 0.3s ease;
+  height: 100%;
+  transition: width 0.3s ease;
 }
 
-.content {
-    margin-left: 5rem;
-    padding: 1rem;
-    transition: width 0.3s ease;
-    flex-grow: 1;
-    overflow-x: hidden;
-    height: 100vh;
-    overflow-y:visible;
+.contentContainer {
+  padding: 1rem;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 12px;
+  width: 100%;
 }
-.open {
-    margin-left: 17rem;
-    transition: 0.3s ease;
-}
-
 .searchBar {
-    margin-left: 5rem;
-    height: 100vh;
-    position: fixed;
-    width: 28rem;
-    position: absolute;
-    z-index: 9;
-    color: black;
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 8px;
-    border-right: 1px solid var(--grey-color3);
-    background-color: #fff;
+  margin-left: 5rem;
+  height: 100vh;
+  position: fixed;
+  width: 28rem;
+  position: absolute;
+  z-index: 9;
+  color: black;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 8px;
+  border-right: 1px solid var(--grey-color3);
+  background-color: #fff;
+  visibility: hidden;
+  transform: translateX(-100%);
+  opacity: 0;
+  transition:
+    visibility 0.3s ease,
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 .hide {
-    visibility: hidden;
+  visibility: hidden;
+}
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+.searchBar.visible {
+  visibility: visible;
+  animation: slideIn 0.3s forwards;
+}
+
+.searchBar.hidden {
+  visibility: hidden;
+  animation: slideOut 0.3s forwards;
 }

@@ -3,24 +3,35 @@ import avatar from './../../assets/avatar.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { GoHome } from 'react-icons/go'
+import { GoHomeFill } from 'react-icons/go'
+
+import { GoSearch } from 'react-icons/go'
+import { IoIosAddCircleOutline } from 'react-icons/io'
+import { RiMessengerLine } from 'react-icons/ri'
+import { RiMessengerFill } from 'react-icons/ri'
+import { IoMdHeartEmpty } from 'react-icons/io'
+import { FaWpexplorer } from 'react-icons/fa'
+import { CiYoutube } from 'react-icons/ci'
+import { IoMdHeart } from 'react-icons/io'
 
 interface Menu {
   name: string
-  path: string
+  path?: string
   icon: React.ReactNode[] // Allow JSX for icon
 }
 
 const Animation = {
   open: {
     x: 0,
-    width: '17rem',
+    width: '245px',
     transition: {
       damping: 100
     }
   },
   closed: {
     x: 0,
-    width: '5rem',
+    width: '72px',
     transition: {
       damping: 100,
       delay: 0.1
@@ -32,58 +43,37 @@ const MenuList: Array<Menu> = [
   {
     name: 'Home',
     path: '/',
-    icon: [
-      <span className='material-symbols-sharp md-32'>home</span>,
-      <span className='material-symbols-sharp filled md-32'>home</span>
-    ] // JSX element
+    icon: [<GoHome className='stroke-0 w-8 h-8' />, <GoHomeFill color='red' className=' w-8 h-8' />] // JSX element
   },
   {
     name: 'Search',
-    path: '/',
-    icon: [
-      <span className='material-symbols-sharp md-32'>search</span>,
-      <span className='material-symbols-sharp filled md-32 weight'>search</span>
-    ]
+    icon: [<GoSearch className='stroke-0 w-8 h-8' />, <GoSearch className='stroke-1 w-8 h-8' />]
   },
   {
     name: 'Explore',
     path: '/explore',
-    icon: [
-      <span className='material-symbols-sharp md-32'>explore</span>,
-      <span className='material-symbols-sharp filled md-32'>explore</span>
-    ]
+    icon: [<FaWpexplorer className='stroke-0 w-8 h-8' />, <FaWpexplorer className='stroke-1 w-8 h-8' />]
   },
   {
     name: 'Create',
-    path: '/',
     icon: [
-      <span className='material-symbols-sharp md-32'>add_circle</span>,
-      <span className='material-symbols-sharp filled md-32'>add_circle</span>
+      <IoIosAddCircleOutline className='stroke-0 w-8 h-8' />,
+      <IoIosAddCircleOutline className='stroke-1 w-8 h-8' />
     ]
   },
   {
     name: 'Reels',
     path: '/reels',
-    icon: [
-      <span className='material-symbols-sharp md-32'>play_circle</span>,
-      <span className='material-symbols-sharp filled md-32'>play_circle</span>
-    ]
+    icon: [<CiYoutube className='stroke-0 w-8 h-8' />, <CiYoutube className='stroke-1 w-8 h-8' />]
   },
   {
     name: 'Messages',
     path: '/messages',
-    icon: [
-      <span className='material-symbols-sharp md-32'>maps_ugc</span>,
-      <span className='material-symbols-sharp filled md-32'>maps_ugc</span>
-    ]
+    icon: [<RiMessengerLine className='stroke-0 w-8 h-8' />, <RiMessengerFill className='stroke-0 w-8 h-8' />]
   },
   {
     name: 'Notifications',
-    path: '/',
-    icon: [
-      <span className='material-symbols-sharp md-32'>favorite</span>,
-      <span className='material-symbols-sharp filled md-32'>favorite</span>
-    ]
+    icon: [<IoMdHeartEmpty className='w-7 h-7 stroke-1' />, <IoMdHeart className='w-7 h-7 text-red-500' />]
   },
   {
     name: 'Profile',
@@ -118,7 +108,9 @@ const Sidebar = ({
       setIsOpen(true)
     }
     setActiveMenu(name)
-    navigate(path)
+    if (path) {
+      navigate(path)
+    }
   }
 
   useEffect(() => {
@@ -137,7 +129,7 @@ const Sidebar = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ ease: 'easeOut', duration: 1 }}
+          style={{ height: '100px' }}
           key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
         >
           {isOpen ? (
@@ -183,10 +175,13 @@ const MenuItem = ({
   onClick: () => void
 }) => {
   return (
-    <li className={`${styles.menuItem} ${!isOpen && styles.close}`} onClick={onClick}>
+    <li
+      className={`${styles.menuItem} ${!isOpen ? 'w-[50px] h-[50px]' : 'w-full'} ${!isOpen && styles.close}`}
+      onClick={onClick}
+    >
       <div className={activeMenu === name ? styles.linkActive : styles.link}>
         <div
-          className={`${activeMenu === name && (name === 'Search' || name === 'Notifications') && styles.iconActive} ${styles.icon}`}
+          className={`w-[50px] h-[50px] ${activeMenu === name && (name === 'Search' || name === 'Notifications') && styles.iconActive} ${styles.icon}`}
         >
           {activeMenu === name ? icon[1] : icon[0]}
         </div>

@@ -9,8 +9,8 @@ const Explore = (): React.JSX.Element => {
     setIsPopupOpen(false)
   }
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
+    <div className={`${styles.container} `}>
+      <div className={`${styles.content}`}>
         <PostItem onClick={() => setIsPopupOpen(true)}></PostItem>
         <PostItem onClick={() => setIsPopupOpen(true)}></PostItem>
         <PostItem onClick={() => setIsPopupOpen(true)}></PostItem>

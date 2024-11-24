@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px 100px;
+  overflow-y: auto;
 }
 
 .content {

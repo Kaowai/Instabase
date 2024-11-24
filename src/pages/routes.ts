@@ -4,6 +4,7 @@ import Explore from './Explore/Explore'
 import Reels from './Reels/Reels'
 import Message from './Message/Message'
 import Personal from './Personal/Personal'
+import Story from './Story/Story'
 
 interface Props {
   children: React.ReactNode
@@ -11,7 +12,7 @@ interface Props {
 interface Route {
   path: string
   component: () => React.JSX.Element
-  layout: ({ children }: Props) => React.ReactNode
+  layout?: ({ children }: Props) => React.ReactNode
 }
 
 const publicRoutes: Route[] = [
@@ -39,6 +40,10 @@ const publicRoutes: Route[] = [
     path: '/profile',
     component: Personal,
     layout: Layout
+  },
+  {
+    path: '/stories/:id',
+    component: Story
   }
 ]
 

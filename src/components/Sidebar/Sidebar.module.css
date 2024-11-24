@@ -14,6 +14,8 @@ ul {
   font-size: 0.9rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -33,20 +35,33 @@ ul {
   display: flex;
   align-items: center;
   border-radius: 6px;
-  padding-left: 5px;
+  width: 100%;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .menuItem .icon * {
-  transition: transform 0.3s ease;
+  animation: appear 0.3s ease-in-out;
 }
 
-.menuItem:hover .icon * {
-  transform: scale(1.1);
-} 
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* .menuItem:hover .icon * {
+  transform: scale(1.05);
+}
 
 .menuItem:active .icon * {
-  transform: scale(0.95);
-}
+  transform: scal
+  
+  e(0.95);
+} */
 
 .menuItem:hover {
   background-color: var(--hover-color);
@@ -75,8 +90,6 @@ ul {
 }
 
 .icon {
-  height: 40px;
-  width: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -89,5 +102,5 @@ ul {
 }
 
 .iconActive {
-  border: 1px solid var(--hover-color);
+  border: 1px solid var(--grey-color3);
 }
