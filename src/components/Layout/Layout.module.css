@@ -23,7 +23,7 @@
   height: 100vh;
   position: fixed;
   width: 28rem;
-  position: absolute;
+  position: fixed;
   z-index: 9;
   color: black;
   border-top-right-radius: 16px;

@@ -28,7 +28,7 @@ const Comment = () => {
         <div>
           <span className='font-medium text-black'>dannyparrow</span>
           <span> </span>
-          <p className='font-light text-grey-color2 inline'>
+          <p className='font-light text-black inline'>
             {isExpanded || comment.length <= MAX_LENGTH ? comment : `${comment.slice(0, MAX_LENGTH)}...`}
             {comment.length > MAX_LENGTH && (
               <span className='text-blue-500 cursor-pointer font-medium' onClick={handleToggle}>
@@ -51,7 +51,7 @@ const Comment = () => {
         transition={{ type: 'spring', stiffness: 300 }}
       >
         {liked ? (
-          <FaHeart size={16} style={{ color: 'red' }} className='text-red-500' />
+          <FaHeart size={16} style={{ color: 'red' }} fill='red' className='text-red-500' />
         ) : (
           <FaRegHeart size={16} className='text-gray-500' />
         )}

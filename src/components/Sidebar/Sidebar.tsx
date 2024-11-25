@@ -1,6 +1,5 @@
 import styles from './sidebar.module.css'
 import avatar from './../../assets/avatar.png'
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { GoHome } from 'react-icons/go'
@@ -93,12 +92,15 @@ const LogoApp: Menu = {
 
 const Sidebar = ({
   isOpen,
-  setIsOpen
+  setIsOpen,
+  activeMenu,
+  setActiveMenu
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  activeMenu: string
+  setActiveMenu: React.Dispatch<React.SetStateAction<string>>
 }) => {
-  const [activeMenu, setActiveMenu] = useState<string>('Home')
   const navigate = useNavigate()
 
   const handleClickItem = ({ name, path }: Menu) => {
@@ -112,10 +114,6 @@ const Sidebar = ({
       navigate(path)
     }
   }
-
-  useEffect(() => {
-    console.log(activeMenu)
-  }, [activeMenu])
 
   return (
     <motion.div
