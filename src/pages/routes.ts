@@ -5,6 +5,8 @@ import Reels from './Reels/Reels'
 import Message from './Message/Message'
 import Personal from './Personal/Personal'
 import Story from './Story/Story'
+import Login from './Login/Login'
+import Signup from './Signup/Signup'
 
 interface Props {
   children: React.ReactNode
@@ -44,6 +46,14 @@ const publicRoutes: Route[] = [
   {
     path: '/stories/:id',
     component: Story
+  },
+  {
+    path: '/login',
+    component: Login
+  },
+  {
+    path: '/signup',
+    component: Signup
   }
 ]
 

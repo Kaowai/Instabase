@@ -42,6 +42,17 @@
 .md-24 {
   font-size: 24px;
 }
+
+.logo {
+  font-family: 'Satisfy', cursive;
+  font-weight: 300;
+  font-style: normal;
+  font-size: 2.4rem;
+  display: flex;
+  justify-content: start;
+  padding: 10px;
+}
+
 .material-symbols-sharp.weight {
   font-variation-settings:
     'FILL' 1,
