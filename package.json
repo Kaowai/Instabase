@@ -14,12 +14,16 @@
   },
   "dependencies": {
     "@angular/fire": "^18.0.1",
+    "@hookform/resolvers": "^3.9.1",
+    "axios": "^1.7.8",
     "firebase": "^10.14.1",
     "framer-motion": "^11.11.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.2",
     "react-icons": "^5.3.0",
-    "react-router-dom": "^6.27.0"
+    "react-router-dom": "^6.27.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

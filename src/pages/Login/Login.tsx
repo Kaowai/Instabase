@@ -1,6 +1,53 @@
-import React from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import * as yup from 'yup'
+import { loginService } from '../../apis/authService'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+const schema = yup
+  .object()
+  .shape({
+    email: yup.string().email().required('Email is required').trim(),
+    password: yup
+      .string()
+      .required('Password is required')
+      .min(6, 'Password must be at least 6 characters')
+      .max(20, 'Password must be at most 20 characters')
+      .matches(/^[a-zA-Z0-9]{6,20}$/, 'Password must be alphanumeric with no special characters')
+  })
+  .required()
 
 const Login = () => {
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const navigate = useNavigate()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema)
+  })
+
+  const onSubmit = async (data: any): Promise<void> => {
+    try {
+      const response = await loginService(data?.email, data?.password)
+
+      // Lưu token và thông tin user vào localStorage
+
+      alert('Đăng nhập thành công!')
+      console.log(response)
+      navigate('/')
+      // Redirect hoặc cập nhật state của ứng dụng
+    } catch (err: any) {
+      setError(err || 'Đăng nhập thất bại!')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center'>
       <div className='w-[350px] h-[410px] border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
@@ -10,20 +57,33 @@ const Login = () => {
         </div>
 
         {/* Form */}
-        <form action='' className='py-4 flex w-full justify-center items-center flex-col gap-2'>
-          <input
-            type='email'
-            placeholder='Email'
-            className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
-          />
-          <input
-            type='password'
-            placeholder='Password'
-            className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
-          />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className='py-4 flex w-full justify-center items-center flex-col gap-2'
+          noValidate
+        >
+          <div className='w-full'>
+            <input
+              type='email'
+              autoComplete='off'
+              {...register('email')}
+              placeholder='Email'
+              className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
+            />
+            {errors.email && <p>{errors.email.message}</p>}
+          </div>
+          <div className='w-full'>
+            <input
+              type='password'
+              autoComplete='off'
+              {...register('password')}
+              placeholder='Password'
+              className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
+            />
+            {errors.password && <p>{errors.password.message}</p>}
+          </div>
           <button
             type='submit'
-            disabled
             className='text-white font-bold text-sm disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3'
           >
             Log in
