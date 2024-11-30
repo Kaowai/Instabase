@@ -53,6 +53,15 @@
   padding: 10px;
 }
 
+.errors {
+  font-size: 11px;
+  font-weight: medium;
+  color: red;
+}
+.errors::before {
+  content: '*';
+}
+
 .material-symbols-sharp.weight {
   font-variation-settings:
     'FILL' 1,

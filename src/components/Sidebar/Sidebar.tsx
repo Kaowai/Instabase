@@ -13,6 +13,8 @@ import { IoMdHeartEmpty } from 'react-icons/io'
 import { FaWpexplorer } from 'react-icons/fa'
 import { CiYoutube } from 'react-icons/ci'
 import { IoMdHeart } from 'react-icons/io'
+import { useState } from 'react'
+import PostCreateCard from '../Modal/PostCreateCard/PostCreateCard'
 
 interface Menu {
   name: string
@@ -102,60 +104,72 @@ const Sidebar = ({
   setActiveMenu: React.Dispatch<React.SetStateAction<string>>
 }) => {
   const navigate = useNavigate()
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
 
   const handleClickItem = ({ name, path }: Menu) => {
+    if (name == 'Create') {
+      setIsPopupOpen(true)
+    }
     if (name === 'Search' || name === 'Messages' || name === 'Notifications') {
       setIsOpen(false)
     } else {
       setIsOpen(true)
     }
     setActiveMenu(name)
+
     if (path) {
       navigate(path)
     }
   }
 
+  const onClose = () => {
+    setIsPopupOpen(!isPopupOpen)
+  }
+
   return (
-    <motion.div
-      initial={{ x: 0 }}
-      variants={Animation}
-      animate={isOpen ? 'open' : 'closed'}
-      className={styles.sidebarContainer}
-    >
-      <ul>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          style={{ height: '100px' }}
-          key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
-        >
-          {isOpen ? (
-            <div className={styles.logo}>Instacloud</div>
-          ) : (
-            <div style={{ marginBottom: '20px' }}>
-              <MenuItem
-                activeMenu={activeMenu}
-                isOpen={isOpen}
-                name={LogoApp.name}
-                icon={LogoApp.icon}
-                onClick={() => handleClickItem(LogoApp)}
-              />
-            </div>
-          )}
-        </motion.div>
-        {MenuList.map((menu) => (
-          <MenuItem
-            activeMenu={activeMenu}
-            key={menu.name}
-            isOpen={isOpen}
-            name={menu.name}
-            icon={menu.icon}
-            onClick={() => handleClickItem(menu)}
-          />
-        ))}
-      </ul>
-    </motion.div>
+    <>
+      <motion.div
+        initial={{ x: 0 }}
+        variants={Animation}
+        animate={isOpen ? 'open' : 'closed'}
+        className={styles.sidebarContainer}
+      >
+        <ul>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ height: '100px' }}
+            key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
+          >
+            {isOpen ? (
+              <div className={styles.logo}>Instacloud</div>
+            ) : (
+              <div style={{ marginBottom: '20px' }}>
+                <MenuItem
+                  activeMenu={activeMenu}
+                  isOpen={isOpen}
+                  name={LogoApp.name}
+                  icon={LogoApp.icon}
+                  onClick={() => handleClickItem(LogoApp)}
+                />
+              </div>
+            )}
+          </motion.div>
+          {MenuList.map((menu) => (
+            <MenuItem
+              activeMenu={activeMenu}
+              key={menu.name}
+              isOpen={isOpen}
+              name={menu.name}
+              icon={menu.icon}
+              onClick={() => handleClickItem(menu)}
+            />
+          ))}
+        </ul>
+      </motion.div>
+      <PostCreateCard isVisible={isPopupOpen} onClose={onClose} />
+    </>
   )
 }
 

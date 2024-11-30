@@ -2,8 +2,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { loginService } from '../../apis/authService'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+interface LoginInput {
+  email: string
+  password: string
+}
 
 const schema = yup
   .object()
@@ -19,8 +23,8 @@ const schema = yup
   .required()
 
 const Login = () => {
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true) // Trạng thái kiểm tra
   const navigate = useNavigate()
 
   const {
@@ -31,28 +35,43 @@ const Login = () => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = async (data: any): Promise<void> => {
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    if (userId) {
+      navigate('/', { replace: true }) // Chuyển hướng nếu đã xác thực
+    } else {
+      setIsCheckingAuth(false) // Cho phép hiển thị form login
+    }
+  }, [])
+
+  const onSubmit = async (data: LoginInput): Promise<void> => {
+    setLoading(true)
     try {
-      const response = await loginService(data?.email, data?.password)
-
-      // Lưu token và thông tin user vào localStorage
-
-      alert('Đăng nhập thành công!')
-      console.log(response)
-      navigate('/')
-      // Redirect hoặc cập nhật state của ứng dụng
+      const response = await loginService(data.email, data.password)
+      localStorage.setItem('userId', response.userId)
+      navigate('/', { replace: true }) // Điều hướng sau khi đăng nhập thành công
     } catch (err: any) {
-      setError(err || 'Đăng nhập thất bại!')
+      console.log(err)
     } finally {
       setLoading(false)
     }
   }
 
+  // Hiển thị màn hình tải trong khi kiểm tra xác thực
+  if (isCheckingAuth) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  // Form đăng nhập
   return (
     <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center'>
       <div className='w-[350px] h-[410px] border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
         {/* Logo */}
-        <div className=' flex h-32 justify-center items-center w-full'>
+        <div className='flex h-32 justify-center items-center w-full'>
           <span className='logo'>Instacloud</span>
         </div>
 
@@ -65,12 +84,13 @@ const Login = () => {
           <div className='w-full'>
             <input
               type='email'
+              autoFocus
               autoComplete='off'
               {...register('email')}
               placeholder='Email'
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
             />
-            {errors.email && <p>{errors.email.message}</p>}
+            {errors.email && <p className='errors'>{errors.email.message}</p>}
           </div>
           <div className='w-full'>
             <input
@@ -80,7 +100,7 @@ const Login = () => {
               placeholder='Password'
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
             />
-            {errors.password && <p>{errors.password.message}</p>}
+            {errors.password && <p className='errors'>{errors.password.message}</p>}
           </div>
           <button
             type='submit'
@@ -89,22 +109,6 @@ const Login = () => {
             Log in
           </button>
         </form>
-
-        {/* Divider */}
-        <div className='flex justify-center items-center w-full mt-2 gap-4'>
-          <div className='border-b-[1px] border-grey-color3 w-full'></div>
-          <span className='text-grey-color2 font-semibold text-xs'>OR</span>
-          <div className='border-b-[1px] border-grey-color3 w-full'></div>
-        </div>
-
-        {/* Forgot password */}
-        <div className='flex justify-center items-center w-full mt-2 cursor-pointer hover:text-blue-500'>
-          <span>Forgot password?</span>
-        </div>
-      </div>
-      <div className='w-[350px] border-[1px] border-grey-color3 flex items-center justify-center gap-2 p-8'>
-        <span className='text-grey-color2'>Don't have an account?</span>
-        <span className='text-blue-600 hover:text-blue-800 font-semibold cursor-pointer'>Sign up</span>
       </div>
     </div>
   )

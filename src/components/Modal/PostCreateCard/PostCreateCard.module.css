@@ -1,0 +1,59 @@
+@keyframes popup-enter {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes popup-exit {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.popup {
+  animation: popup-enter 0.1s ease-out;
+  transition: all 0.3s ease-in-out; /* Chuyển đổi mượt */
+  transform-origin: right center; /* Gốc là bên phải */
+}
+
+.noScrollbar {
+  -ms-overflow-style: none; /* Hide scrollbar for IE */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.noScrollbar::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+
+/* Thêm vào PostCreateCard.module.css */
+.slide-enter {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-exit {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+}

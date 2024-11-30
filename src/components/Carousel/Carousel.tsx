@@ -4,8 +4,9 @@ type Props = {
   images: Array<string>
   autoSlide?: boolean
   autoSlideInterval?: number | 3000
+  isCreate?: boolean
 }
-const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000 }: Props) => {
+const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000, isCreate = false }: Props) => {
   const [curr, setCurr] = useState(1)
 
   const prev = () => setCurr((curr) => (curr === 0 ? images.length - 1 : curr - 1))
@@ -26,7 +27,7 @@ const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000
   return (
     <div className='overflow-hidden relative box-border	'>
       <div
-        className='flex box-border h-[680px] max-h-[680px] w-[700px] max-w-[780px] transition-transform ease-out duration-500'
+        className={`flex box-border ${!isCreate ? 'h-[680px] max-h-[680px] w-[700px] max-w-[780px]' : 'w-[520px] h-[490px]'} transition-transform ease-out duration-500`}
         style={{ transform: `translate(-${curr * 100}%)` }}
       >
         {images.map((src, index) => (
@@ -58,7 +59,7 @@ const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000
         <div className='flex items-center justify-center gap-2'>
           {images.map((_, i) => (
             <div
-              className={`transition-all w-2 h-2 bg-white rounded-full ${curr == i ? 'p-1' : 'bg-opacity-50'}`}
+              className={`transition-all w-2 h-2 bg-blue-500 rounded-full ${curr == i ? 'p-1' : 'bg-white bg-opacity-50'}`}
             ></div>
           ))}
         </div>

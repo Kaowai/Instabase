@@ -46,14 +46,6 @@ const publicRoutes: Route[] = [
   {
     path: '/stories/:id',
     component: Story
-  },
-  {
-    path: '/login',
-    component: Login
-  },
-  {
-    path: '/signup',
-    component: Signup
   }
 ]
 
