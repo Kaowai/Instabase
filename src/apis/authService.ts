@@ -23,7 +23,7 @@ export const signUpService = async (email: string, password: string): Promise<Si
 
 export const setNameAndAvatarService = async (userId: string, name: string, avatar: string): Promise<string> => {
   try {
-    const response = await appClient.post('/users/setNameAndAvatar')
+    const response = await appClient.post('/users/setNameAndAvatar', { userId, name, avatar })
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

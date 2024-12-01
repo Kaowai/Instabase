@@ -6,6 +6,8 @@ import { FaArrowLeft } from 'react-icons/fa6'
 import { FaArrowRight } from 'react-icons/fa6'
 import Carousel from '../../Carousel/Carousel'
 import avatar2 from '../../../assets/avatar2.webp'
+import { UserResponse } from '../../../models/User/User.model'
+import { searchGlobalUserService } from '../../../apis/userService'
 
 type Props = {
   isVisible: boolean
@@ -15,6 +17,9 @@ type Props = {
 const PostCreateCard = ({ isVisible, onClose }: Props) => {
   const [step, setStep] = useState<number>(1)
   const [images, setImages] = useState<string[]>([]) // Chứa URL của các ảnh đã chọn
+  const [isShowSearch, setIsShowSearch] = useState<boolean>(false)
+  const [inputContent, setInputContent] = useState<string>('') // Nội dung textarea
+  const [userSearch, setUserSearch] = useState<UserResponse[]>([])
 
   useEffect(() => {
     if (isVisible) {
@@ -35,8 +40,19 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   }, [isVisible])
 
   const handleChooseImage = () => {
-    handleAddImage()
-    setStep(2)
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.multiple = true // Cho phép chọn nhiều ảnh
+    input.onchange = (event) => {
+      const files = (event.target as HTMLInputElement)?.files
+      if (files) {
+        const imageUrls = Array.from(files).map((file) => URL.createObjectURL(file))
+        setImages((prevImages) => [...prevImages, ...imageUrls]) // Cập nhật danh sách ảnh
+        setStep(2)
+      }
+    }
+    input.click()
   }
 
   if (!isVisible) return null
@@ -67,6 +83,45 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   }
 
   const handleSubmit = () => {}
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const content = event.target.value
+    setInputContent(content)
+
+    // Kiểm tra xem ký tự cuối cùng có phải là "@" hay không
+    const lastWord = content.split(' ').pop() // Lấy từ cuối cùng
+
+    if (lastWord?.startsWith('@')) {
+      setIsShowSearch(true)
+    } else {
+      setIsShowSearch(false)
+    }
+
+    const delayDebounce = setTimeout(() => {
+      const lastWord = inputContent.split(' ').pop()
+      if (lastWord?.startsWith('@')) {
+        console.log('Last word: ', lastWord)
+        const keyword = lastWord.slice(1)
+        if (keyword.trim() === '') return
+
+        const fetchUsers = async () => {
+          try {
+            console.log('Key word', keyword.trim())
+            // const response = await searchGlobalUserService(keyword)
+            // setUserSearch(response)
+            // console.log('Response', response)
+          } catch (error) {
+            console.log('Error', error)
+          }
+        }
+
+        fetchUsers()
+      }
+    }, 300) // Chỉ gọi sau khi người dùng ngừng nhập trong 300ms
+
+    return () => clearTimeout(delayDebounce) // Cleanup timeout nếu `inputContent` thay đổi
+  }
+
   return (
     <div className='fixed overflow-y-hidden box-border inset-0 z-[1000] flex items-center justify-center'>
       {/* Lớp phủ mờ */}
@@ -101,7 +156,7 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
         </div>
 
         {/* Content create new post */}
-        <div className={`w-full mt-12 h-full ${step === 3 && 'grid grid-cols-[520px_500px]'}`}>
+        <div className={`w-full mt-12 h-full ${step === 3 && 'grid grid-cols-[520px_380px]'}`}>
           <div
             className={` w-full h-full flex justify-center items-center flex-col ${styles.noScrollbar} overflow-y-scroll`}
           >
@@ -149,17 +204,37 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
               </div>
             )}
           </div>
-          <div className='border-l-[1px] p-4 border-grey-color3 w-full h-full'>
-            <div className='flex justify-start items-center gap-2'>
+          <div className='border-l-[1px] border-grey-color3 w-full'>
+            <div className='flex justify-start items-center gap-2 p-4'>
               <img className={`w-10 h-10 rounded-[90px] object-cover`} src={avatar2} alt='' />
               <span className='font-medium'>hoaiisreal</span>
             </div>
-            <div className='mt-4'>
+            <div className=' px-4 border-b-[1px] border-grey-color3'>
               <textarea
+                onChange={handleChange}
+                value={inputContent}
                 maxLength={1000}
-                className={`resize-none w-[350px] h-32 overflow-y-scroll ${styles.noScrollbar} outline-none font-normal`}
+                className={`resize-none w-[350px] h-48 overflow-y-scroll ${styles.noScrollbar} outline-none font-normal`}
               ></textarea>
             </div>
+            {isShowSearch && (
+              <div className={`overflow-y-scroll ${styles.noScrollbar} w-full h-56`}>
+                <ul className=''>
+                  {userSearch.map((user) => (
+                    <li
+                      key={user.userId}
+                      className='list-none gap-2 p-1 cursor-pointer	w-full border-b-[1px] border-grey-color3 flex justify-start items-center hover:bg-grey-color1'
+                    >
+                      <img className={`w-8 h-8 rounded-[90px] object-cover`} src={avatar2} alt='' />
+                      <div className='flex flex-col justify-start items-start'>
+                        <span className='font-bold'>{user?.nickName}</span>
+                        <span className='font-normal'>{user?.fullName}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
