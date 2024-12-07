@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import styles from './PostCreateCard.module.css'
 import { BsImages } from 'react-icons/bs'
@@ -8,20 +8,29 @@ import Carousel from '../../Carousel/Carousel'
 import avatar2 from '../../../assets/avatar2.webp'
 import { UserResponse } from '../../../models/User/User.model'
 import { searchGlobalUserService } from '../../../apis/userService'
-
+import _ from 'lodash'
+import defaultAvatar from '../../../assets/default_avatar.jpg'
 type Props = {
   isVisible: boolean
   onClose: () => void
 }
 
 const PostCreateCard = ({ isVisible, onClose }: Props) => {
+  const MAX_LENGTH = 1000
+
   const [step, setStep] = useState<number>(1)
   const [images, setImages] = useState<string[]>([]) // Chứa URL của các ảnh đã chọn
   const [isShowSearch, setIsShowSearch] = useState<boolean>(false)
-  const [inputContent, setInputContent] = useState<string>('') // Nội dung textarea
+  const [inputContent, setInputContent] = useState<string>('') // Nội dung div nhập vào => dùng để debounce
   const [userSearch, setUserSearch] = useState<UserResponse[]>([])
+  const [keywordSearch, setKeyWordSearch] = useState<string>('')
+  const [debouncedKeyword, setDebouncedKeyword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [htmlString, setHtmlString] = useState<string>('')
+  const [listUserTag, setListUserTag] = useState<UserResponse[]>([])
 
   useEffect(() => {
+    resetSetting()
     if (isVisible) {
       // Chặn cuộn của trang ngoài khi popup mở
       const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth // Độ rộng thanh cuộn
@@ -38,6 +47,42 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
       document.body.style.paddingRight = ''
     }
   }, [isVisible])
+
+  useEffect(() => {
+    const handler = _.debounce(() => {
+      setDebouncedKeyword(keywordSearch)
+    }, 300) // 300ms debounce delay
+
+    handler()
+
+    return () => {
+      handler.cancel()
+    }
+  }, [keywordSearch])
+
+  useEffect(() => {
+    if (debouncedKeyword) {
+      searchGlobalUserService(debouncedKeyword)
+        .then((response) => {
+          setUserSearch(response)
+        })
+        .catch((error) => {
+          console.log('Error: ', error)
+        })
+      setIsLoading(false)
+    }
+  }, [debouncedKeyword])
+
+  const resetSetting = () => {
+    setStep(1)
+    setImages([])
+    setInputContent('')
+    setKeyWordSearch('')
+    setUserSearch([])
+    setIsShowSearch(false)
+    setHtmlString('')
+    setListUserTag([])
+  }
 
   const handleChooseImage = () => {
     const input = document.createElement('input')
@@ -71,6 +116,51 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     }
     input.click()
   }
+  const handleChooseUser = (user: UserResponse) => {
+    setListUserTag((prev) => [...prev, user])
+
+    const words = inputContent.split(' ')
+    words[words.length - 1] = `<a className='font-bold'>${user.nickName}</a>&nbsp;`
+    let updatedContent = words.join(' ')
+
+    listUserTag.forEach((taggedUser) => {
+      const regex = new RegExp(`\\b${taggedUser.nickName}\\b`, 'g')
+      updatedContent = updatedContent.replace(regex, `<a className='font-bold'>${taggedUser.nickName}</a>`)
+    })
+
+    updatedContent += '<br/><span></span>'
+    setHtmlString(updatedContent)
+
+    setTimeout(() => {
+      const div = document.querySelector('[contenteditable="true"]') as HTMLDivElement
+      if (div) {
+        div.focus()
+        const range = document.createRange()
+        const selection = window.getSelection()
+
+        // Đặt con trỏ sau ký tự cuối cùng trong thẻ div
+        const lastChild = div.lastChild
+        if (lastChild) {
+          if (lastChild.nodeType === Node.TEXT_NODE) {
+            range.setStart(lastChild, lastChild.textContent?.length || 0)
+          } else if (lastChild.nodeType === Node.ELEMENT_NODE) {
+            range.selectNodeContents(lastChild)
+            range.collapse(false)
+          }
+        } else {
+          range.selectNodeContents(div)
+          range.collapse(false)
+        }
+
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+    }, 0)
+
+    setIsShowSearch(false)
+    setUserSearch([])
+    setIsLoading(false)
+  }
 
   const handleBackStep = () => {
     if (step === 2) {
@@ -84,42 +174,25 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
 
   const handleSubmit = () => {}
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const content = event.target.value
+  const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
+    let content = event.currentTarget.innerText || ''
+
+    // Check content nếu vượt quá số lượng từ qui định
+    if (content.length > MAX_LENGTH) {
+      content = content.slice(0, MAX_LENGTH) // Cắt bớt nếu vượt quá giới hạn
+    }
+
+    // Set description cho content gửi api
     setInputContent(content)
 
-    // Kiểm tra xem ký tự cuối cùng có phải là "@" hay không
-    const lastWord = content.split(' ').pop() // Lấy từ cuối cùng
-
-    if (lastWord?.startsWith('@')) {
+    // Lấy từ cuối của content có chứa @
+    const lastWord = content.split(' ').pop()
+    if (lastWord?.startsWith('@') && lastWord.length > 1) {
       setIsShowSearch(true)
+      setKeyWordSearch(lastWord.slice(1))
     } else {
       setIsShowSearch(false)
     }
-
-    const delayDebounce = setTimeout(() => {
-      const lastWord = inputContent.split(' ').pop()
-      if (lastWord?.startsWith('@')) {
-        console.log('Last word: ', lastWord)
-        const keyword = lastWord.slice(1)
-        if (keyword.trim() === '') return
-
-        const fetchUsers = async () => {
-          try {
-            console.log('Key word', keyword.trim())
-            // const response = await searchGlobalUserService(keyword)
-            // setUserSearch(response)
-            // console.log('Response', response)
-          } catch (error) {
-            console.log('Error', error)
-          }
-        }
-
-        fetchUsers()
-      }
-    }, 300) // Chỉ gọi sau khi người dùng ngừng nhập trong 300ms
-
-    return () => clearTimeout(delayDebounce) // Cleanup timeout nếu `inputContent` thay đổi
   }
 
   return (
@@ -210,29 +283,40 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
               <span className='font-medium'>hoaiisreal</span>
             </div>
             <div className=' px-4 border-b-[1px] border-grey-color3'>
-              <textarea
-                onChange={handleChange}
-                value={inputContent}
-                maxLength={1000}
+              <div
+                contentEditable='true'
+                onInput={handleChange}
+                dangerouslySetInnerHTML={{ __html: htmlString }}
                 className={`resize-none w-[350px] h-48 overflow-y-scroll ${styles.noScrollbar} outline-none font-normal`}
-              ></textarea>
+              ></div>
             </div>
             {isShowSearch && (
-              <div className={`overflow-y-scroll ${styles.noScrollbar} w-full h-56`}>
-                <ul className=''>
-                  {userSearch.map((user) => (
-                    <li
-                      key={user.userId}
-                      className='list-none gap-2 p-1 cursor-pointer	w-full border-b-[1px] border-grey-color3 flex justify-start items-center hover:bg-grey-color1'
-                    >
-                      <img className={`w-8 h-8 rounded-[90px] object-cover`} src={avatar2} alt='' />
-                      <div className='flex flex-col justify-start items-start'>
-                        <span className='font-bold'>{user?.nickName}</span>
-                        <span className='font-normal'>{user?.fullName}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+              <div className={`overflow-y-scroll ${styles.noScrollbar} w-full border-2 h-56`}>
+                {isLoading ? (
+                  <div className='flex justify-center items-center h-full'>
+                    <span>Loading...</span> {/* Hoặc một spinner */}
+                  </div>
+                ) : (
+                  <ul>
+                    {userSearch.map((user) => (
+                      <li
+                        key={user.userId}
+                        onClick={() => handleChooseUser(user)}
+                        className='list-none gap-2 p-1 cursor-pointer w-full border-b-[1px] border-grey-color3 flex justify-start items-center hover:bg-grey-color1'
+                      >
+                        <img
+                          className={`w-8 h-8 rounded-[90px] object-cover`}
+                          src={user.avatar || defaultAvatar}
+                          alt=''
+                        />
+                        <div className='flex flex-col justify-start items-start'>
+                          <span className='font-bold'>{user?.nickName}</span>
+                          <span className='font-normal'>{user?.fullName}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
           </div>

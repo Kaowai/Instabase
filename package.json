@@ -15,9 +15,11 @@
   "dependencies": {
     "@angular/fire": "^18.0.1",
     "@hookform/resolvers": "^3.9.1",
+    "@types/lodash": "^4.17.13",
     "axios": "^1.7.8",
     "firebase": "^10.14.1",
     "framer-motion": "^11.11.9",
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.2",
