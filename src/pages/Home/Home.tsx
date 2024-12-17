@@ -100,7 +100,8 @@ const ListUser: Array<UserInfo> = [
 const Home = (): React.JSX.Element => {
   return (
     <div className={styles.container}>
-      <div className={styles.grid_column1}>
+      <div className={styles.grid_column1}></div>
+      <div className={styles.grid_column2}>
         <div className={styles.story}>
           {Example.map((account) => {
             return (
@@ -120,7 +121,7 @@ const Home = (): React.JSX.Element => {
           <PostLayout />
         </div>
       </div>
-      <div className={styles.grid_column2}>
+      <div className={styles.grid_column3}>
         <AccountInfo
           nameAccount='hoaiisreal'
           nameUser='Nguyễn Cao Hoài'

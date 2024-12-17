@@ -24,6 +24,11 @@
   box-sizing: border-box;
 }
 
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .material-symbols-sharp.filled {
   font-variation-settings:
     'FILL' 1,

@@ -1,0 +1,13 @@
+.container {
+  margin-left: 5rem;
+  display: grid;
+  grid-template-columns: 28rem 1fr;
+}
+
+.boxchat {
+  overflow-y: hidden;
+  width: 28rem;
+  border-right: 1px solid var(--grey-color3);
+  height: 100vh;
+  position: relative;
+}

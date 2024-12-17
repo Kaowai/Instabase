@@ -46,7 +46,6 @@ const Layout = ({ children }: Props): React.ReactNode => {
 
       {/* Content */}
       <div className={`${styles.contentContainer} ${isOpen && styles.open}`}>
-        <div className={styles.space}>a</div>
         <div className={styles.content}>{children}</div>
       </div>
     </div>

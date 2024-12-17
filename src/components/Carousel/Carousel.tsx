@@ -7,7 +7,7 @@ type Props = {
   isCreate?: boolean
 }
 const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000, isCreate = false }: Props) => {
-  const [curr, setCurr] = useState(1)
+  const [curr, setCurr] = useState(0)
 
   const prev = () => setCurr((curr) => (curr === 0 ? images.length - 1 : curr - 1))
   const next = () => setCurr((curr) => (curr === images.length - 1 ? 0 : curr + 1))
@@ -19,6 +19,10 @@ const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000
     }
   }, [autoSlide, autoSlideInterval])
 
+  useEffect(() => {
+    setCurr(0)
+  }, [])
+
   const handleLoading = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const size = e.currentTarget
     console.log(size.naturalWidth, size.naturalHeight)
@@ -27,13 +31,13 @@ const Carousel: React.FC<Props> = ({ images, autoSlide, autoSlideInterval = 3000
   return (
     <div className='overflow-hidden relative box-border	'>
       <div
-        className={`flex box-border ${!isCreate ? 'h-[680px] max-h-[680px] w-[700px] max-w-[780px]' : 'w-[520px] h-[490px]'} transition-transform ease-out duration-500`}
+        className={`flex box-border ${!isCreate ? 'h-[680px] max-h-[680px] w-[700px] max-w-[780px]' : 'w-[520px] h-[510px]'} transition-transform ease-out duration-500`}
         style={{ transform: `translate(-${curr * 100}%)` }}
       >
         {images.map((src, index) => (
           <img
             key={index}
-            className='w-full h-full object-cover'
+            className='h-[510px] w-[520px] object-cover min-h-[510px] min-w-[520px]'
             src={src}
             onLoad={handleLoading}
             loading='lazy'

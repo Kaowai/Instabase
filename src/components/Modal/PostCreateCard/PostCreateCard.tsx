@@ -10,6 +10,8 @@ import { UserResponse } from '../../../models/User/User.model'
 import { searchGlobalUserService } from '../../../apis/userService'
 import _ from 'lodash'
 import defaultAvatar from '../../../assets/default_avatar.jpg'
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
+import { storage } from '../../../config'
 type Props = {
   isVisible: boolean
   onClose: () => void
@@ -28,6 +30,7 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [htmlString, setHtmlString] = useState<string>('')
   const [listUserTag, setListUserTag] = useState<UserResponse[]>([])
+  const [imageFiles, setImagesFiles] = useState<File[]>([])
 
   useEffect(() => {
     resetSetting()
@@ -82,6 +85,7 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     setIsShowSearch(false)
     setHtmlString('')
     setListUserTag([])
+    setImagesFiles([])
   }
 
   const handleChooseImage = () => {
@@ -92,15 +96,15 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     input.onchange = (event) => {
       const files = (event.target as HTMLInputElement)?.files
       if (files) {
+        const fileArray = Array.from(files)
         const imageUrls = Array.from(files).map((file) => URL.createObjectURL(file))
         setImages((prevImages) => [...prevImages, ...imageUrls]) // Cập nhật danh sách ảnh
+        setImagesFiles((prev) => [...prev, ...fileArray])
         setStep(2)
       }
     }
     input.click()
   }
-
-  if (!isVisible) return null
 
   const handleAddImage = () => {
     const input = document.createElement('input')
@@ -110,8 +114,10 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     input.onchange = (event) => {
       const files = (event.target as HTMLInputElement)?.files
       if (files) {
+        const fileArray = Array.from(files)
         const imageUrls = Array.from(files).map((file) => URL.createObjectURL(file))
         setImages((prevImages) => [...prevImages, ...imageUrls]) // Cập nhật danh sách ảnh
+        setImagesFiles((prev) => [...prev, ...fileArray])
       }
     }
     input.click()
@@ -172,7 +178,60 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     setStep((pre) => pre + 1)
   }
 
-  const handleSubmit = () => {}
+  const handleSubmit = async () => {
+    if (imageFiles.length === 0) {
+      alert('No images to upload')
+      return
+    }
+
+    const uploadedImageUrls: string[] = []
+
+    // Hiển thị thông báo hoặc trạng thái upload
+    setIsLoading(true)
+
+    try {
+      for (const file of imageFiles) {
+        const storageRef = ref(storage, `images/${file.name}-${Date.now()}`)
+        const uploadTask = uploadBytesResumable(storageRef, file)
+
+        // Quản lý tiến trình tải lên
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              console.log(`Upload is ${progress}% done`)
+            },
+            (error) => {
+              console.error('Upload failed:', error)
+              reject(error)
+            },
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+              uploadedImageUrls.push(downloadURL)
+              resolve()
+            }
+          )
+        })
+      }
+
+      // Sau khi upload tất cả ảnh, xử lý tiếp dữ liệu (e.g., lưu vào database)
+      console.log('Uploaded image URLs:', uploadedImageUrls)
+
+      // Reset dữ liệu
+      setImages([])
+      setImagesFiles([])
+      resetSetting()
+
+      // Thông báo thành công
+      alert('Images uploaded successfully!')
+    } catch (error) {
+      console.error('Error uploading images:', error)
+      alert('Failed to upload images. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
     let content = event.currentTarget.innerText || ''
@@ -194,6 +253,8 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
       setIsShowSearch(false)
     }
   }
+
+  if (!isVisible) return null
 
   return (
     <div className='fixed overflow-y-hidden box-border inset-0 z-[1000] flex items-center justify-center'>

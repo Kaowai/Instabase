@@ -1,14 +1,14 @@
 .container {
   display: grid;
-  grid-template-columns: 23fr 10fr;
+  grid-template-columns: 300px 23fr 10fr;
   grid-template-rows: 1fr;
   gap: 10px;
   width: 100%;
   height: 100vh;
-  grid-template-areas: 'content personal';
+  grid-template-areas: 'space content personal';
 }
-.grid_column1,
-.grid_column2 {
+.grid_column2,
+.grid_column3 {
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -16,12 +16,12 @@
   height: 100%;
 }
 
-.grid_column1 {
+.grid_column2 {
   padding: 0 60px;
   grid-area: content;
 }
 
-.grid_column2 {
+.grid_column3 {
   color: white;
   grid-area: personal;
   padding: 15px 50px 15px 0;
