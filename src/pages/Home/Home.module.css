@@ -29,9 +29,10 @@
 
 .story {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 15px 0px;
+  gap: 10px;
   width: 100%;
 }
 

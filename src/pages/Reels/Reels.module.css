@@ -1,0 +1,18 @@
+.reelsContainer {
+  height: calc(100vh);
+  overflow: hidden;
+  position: relative;
+}
+
+.reelsWrapper {
+  height: 100%;
+  transition: transform 1s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrolling {
+  transition: transform 0.7s ease-out;
+}
+
+/* Custom Scrollbar */

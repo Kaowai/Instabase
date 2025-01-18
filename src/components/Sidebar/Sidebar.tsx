@@ -4,17 +4,22 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { GoHome } from 'react-icons/go'
 import { GoHomeFill } from 'react-icons/go'
+import { LuAlignJustify } from 'react-icons/lu'
 
 import { GoSearch } from 'react-icons/go'
 import { IoIosAddCircleOutline } from 'react-icons/io'
-import { RiMessengerLine } from 'react-icons/ri'
-import { RiMessengerFill } from 'react-icons/ri'
 import { IoMdHeartEmpty } from 'react-icons/io'
-import { FaWpexplorer } from 'react-icons/fa'
 import { CiYoutube } from 'react-icons/ci'
 import { IoMdHeart } from 'react-icons/io'
-import { useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import PostCreateCard from '../Modal/PostCreateCard/PostCreateCard'
+import { PiMessengerLogoFill, PiMessengerLogoLight } from 'react-icons/pi'
+import { HiOutlineViewfinderCircle } from 'react-icons/hi2'
+import { HiViewfinderCircle } from 'react-icons/hi2'
+import CreateMenu from '../CreateMenu/CreateMenu'
+import StoryCreateCard from '../StoryCreateCard/StoryCreateCard'
+import ReelsCreateCard from '../Modal/ReelsCreateCard/ReelsCreateCard'
+import SettingMenu from '../SettingMenu/SettingMenu'
 
 interface Menu {
   name: string
@@ -53,7 +58,7 @@ const MenuList: Array<Menu> = [
   {
     name: 'Explore',
     path: '/explore',
-    icon: [<FaWpexplorer className='stroke-0 w-8 h-8' />, <FaWpexplorer className='stroke-1 w-8 h-8' />]
+    icon: [<HiOutlineViewfinderCircle className=' w-8 h-8' />, <HiViewfinderCircle className='stroke-1 w-8 h-8' />]
   },
   {
     name: 'Create',
@@ -65,12 +70,12 @@ const MenuList: Array<Menu> = [
   {
     name: 'Reels',
     path: '/reels',
-    icon: [<CiYoutube className='stroke-0 w-8 h-8' />, <CiYoutube className='stroke-1 w-8 h-8' />]
+    icon: [<CiYoutube className='stroke-0 w-8 h-8' />, <CiYoutube fill='black' className='stroke-1 w-8 h-8' />]
   },
   {
     name: 'Messages',
     path: '/messages',
-    icon: [<RiMessengerLine className='stroke-0 w-8 h-8' />, <RiMessengerFill className='stroke-0 w-8 h-8' />]
+    icon: [<PiMessengerLogoLight className='stroke-0 w-8 h-8' />, <PiMessengerLogoFill className='stroke-0 w-8 h-8' />]
   },
   {
     name: 'Notifications',
@@ -78,11 +83,14 @@ const MenuList: Array<Menu> = [
   },
   {
     name: 'Profile',
-    path: '/profile',
     icon: [
       <img src={avatar} style={{ height: '30px', width: '30px', borderRadius: '90px' }} />,
       <img src={avatar} style={{ height: '30px', width: '30px', borderRadius: '90px', border: '2px solid black' }} />
     ]
+  },
+  {
+    name: 'Settings',
+    icon: [<LuAlignJustify size={24} />, <LuAlignJustify size={24} />]
   }
 ]
 
@@ -96,20 +104,47 @@ const Sidebar = ({
   isOpen,
   setIsOpen,
   activeMenu,
-  setActiveMenu
+  setActiveMenu,
+  isHaveNotification
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   activeMenu: string
   setActiveMenu: React.Dispatch<React.SetStateAction<string>>
+  isHaveNotification: boolean
 }) => {
   const navigate = useNavigate()
-  const [isPopupOpen, setIsPopupOpen] = useState(false)
 
+  const nickName = JSON.parse(sessionStorage.getItem('user') || '{}').nickName
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [createMenuPosition, setCreateMenuPosition] = useState({ top: 0, left: 0 })
+  const [settingsMenuPosition, setSettingsMenuPosition] = useState({ top: 0, left: 0 })
+  const [showCreateMenu, setShowCreateMenu] = useState(false)
+  const [isStoryPopupOpen, setIsStoryPopupOpen] = useState(false)
+  const [isReelsPopupOpen, setIsReelsPopupOpen] = useState(false)
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false)
   const handleClickItem = ({ name, path }: Menu) => {
-    if (name == 'Create') {
-      setIsPopupOpen(true)
+    if (name === 'Create') {
+      const createButton = document.querySelector(`[data-menu-item="Create"]`)
+      if (createButton) {
+        const rect = createButton.getBoundingClientRect()
+        setCreateMenuPosition({ top: rect.top, left: rect.left })
+        setShowCreateMenu(true)
+      }
+      return
     }
+
+    if (name === 'Settings') {
+      const createButton = document.querySelector(`[data-menu-item="Settings"]`)
+      if (createButton) {
+        const rect = createButton.getBoundingClientRect()
+        setSettingsMenuPosition({ top: rect.top, left: rect.left })
+        setShowSettingsMenu(true)
+      }
+      return
+    }
+
     if (name === 'Search' || name === 'Messages' || name === 'Notifications') {
       setIsOpen(false)
     } else {
@@ -117,13 +152,52 @@ const Sidebar = ({
     }
     setActiveMenu(name)
 
-    if (path) {
+    if (name === 'Profile') {
+      navigate(`/${nickName}`)
+    } else if (path) {
       navigate(path)
     }
   }
 
   const onClose = () => {
     setIsPopupOpen(!isPopupOpen)
+  }
+
+  const handleLogout = () => {
+    sessionStorage.clear()
+    navigate('/login')
+  }
+
+  const handleCreateOption = (option: 'post' | 'story' | 'reel') => {
+    setShowCreateMenu(false)
+    switch (option) {
+      case 'post':
+        setIsPopupOpen(true)
+        break
+      case 'story':
+        setIsStoryPopupOpen(true)
+        break
+      case 'reel':
+        setIsReelsPopupOpen(true)
+        break
+    }
+  }
+
+  const handleSettingsOption = (option: 'logout' | 'switch account' | 'settings' | 'your activity') => {
+    setShowSettingsMenu(false)
+    switch (option) {
+      case 'logout':
+        handleLogout()
+        break
+      case 'switch account':
+        break
+      case 'settings':
+        navigate('/your_account/settings')
+        break
+      case 'your activity':
+        navigate('/your_account/activity/interactions')
+        break
+    }
   }
 
   return (
@@ -143,9 +217,9 @@ const Sidebar = ({
             key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
           >
             {isOpen ? (
-              <div className={styles.logo}>Instacloud</div>
+              <div className={'logo'}>Instacloud</div>
             ) : (
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ marginBottom: '20px', marginTop: '1rem' }}>
                 <MenuItem
                   activeMenu={activeMenu}
                   isOpen={isOpen}
@@ -156,7 +230,7 @@ const Sidebar = ({
               </div>
             )}
           </motion.div>
-          {MenuList.map((menu) => (
+          {MenuList.slice(0, 9).map((menu) => (
             <MenuItem
               activeMenu={activeMenu}
               key={menu.name}
@@ -164,11 +238,29 @@ const Sidebar = ({
               name={menu.name}
               icon={menu.icon}
               onClick={() => handleClickItem(menu)}
+              isHaveNotification={menu.name === 'Notifications' && isHaveNotification}
             />
           ))}
         </ul>
       </motion.div>
+
+      <CreateMenu
+        isVisible={showCreateMenu}
+        onClose={() => setShowCreateMenu(false)}
+        onSelectOption={handleCreateOption}
+        position={createMenuPosition}
+      />
+
+      <SettingMenu
+        isVisible={showSettingsMenu}
+        onClose={() => setShowSettingsMenu(false)}
+        onSelectOption={handleSettingsOption}
+        position={settingsMenuPosition}
+      />
+
       <PostCreateCard isVisible={isPopupOpen} onClose={onClose} />
+      <StoryCreateCard isVisible={isStoryPopupOpen} onClose={() => setIsStoryPopupOpen(false)} />
+      <ReelsCreateCard isVisible={isReelsPopupOpen} onClose={() => setIsReelsPopupOpen(false)} />
     </>
   )
 }
@@ -178,17 +270,20 @@ const MenuItem = ({
   isOpen,
   name,
   icon,
-  onClick
+  onClick,
+  isHaveNotification
 }: {
   activeMenu: string
   isOpen: boolean
   name: string
   icon: React.ReactNode[]
   onClick: () => void
+  isHaveNotification?: boolean
 }) => {
   return (
     <li
-      className={`${styles.menuItem} ${!isOpen ? 'w-[50px] h-[50px]' : 'w-full'} ${!isOpen && styles.close}`}
+      data-menu-item={name}
+      className={`${styles.menuItem} ${!isOpen ? 'w-[50px] h-[50px]' : 'w-[220px] h-[50px]'} ${!isOpen && styles.close} ${name === 'Settings' && 'absolute bottom-2 w-full'}`}
       onClick={onClick}
     >
       <div className={activeMenu === name ? styles.linkActive : styles.link}>
@@ -198,6 +293,9 @@ const MenuItem = ({
           {activeMenu === name ? icon[1] : icon[0]}
         </div>
         {isOpen && name}
+        {name === 'Notifications' && isHaveNotification && (
+          <div className={'absolute left-11 mt-5 w-2 h-2 rounded-full bg-red-700'}></div>
+        )}
       </div>
     </li>
   )

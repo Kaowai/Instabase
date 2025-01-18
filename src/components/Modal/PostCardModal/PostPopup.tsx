@@ -1,68 +1,52 @@
 import { useEffect, useState } from 'react'
-import { slides } from '../../../fake-data/slides-image.fake'
 import Carousel from '../../Carousel/Carousel'
 import styles from './PostPopup.module.css'
 import PopupComment from '../../PopupComment/PopupComment'
+import { Post } from '../../../models/post.model'
+import { getPostLike } from '../../../apis/postService'
+import { isLike } from '../../../utils/sharedFunctions'
+import PostCreateCard from '../PostCreateCard/PostCreateCard'
 
 type Props = {
   isVisible: boolean
   onClose: () => void
+  postData: Post
 }
 
-const PostPopup = ({ isVisible, onClose }: Props) => {
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number }[]>([])
-
+const PostPopup = ({ isVisible, onClose, postData }: Props) => {
+  const [isLiked, setIsLiked] = useState(false)
+  
   useEffect(() => {
-    const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
-      return new Promise((resolve, reject) => {
-        const img = new Image()
-        img.src = url
-        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
-        img.onerror = reject
+    getPostLike(postData.postId)
+      .then((userLikeList) => {
+        const user = sessionStorage.getItem('user')
+        if (user) {
+          const userID = JSON.parse(user)?.userId
+          setIsLiked(isLike(userLikeList, userID))
+        }
       })
-    }
-
-    const fetchDimensions = async () => {
-      try {
-        const dimensions = await Promise.all(slides.map((slide) => getImageDimensions(slide)))
-        setImageDimensions(dimensions)
-        console.log(imageDimensions)
-      } catch (error) {
-        console.error('Lỗi khi lấy kích thước ảnh:', error)
-      }
-    }
-
-    fetchDimensions()
-  }, [])
-
+      .catch((err) => console.log(err))
+  }, [postData])
   useEffect(() => {
+    const originalOverflowY = document.body.style.overflowY
+    const originalPaddingRight = document.body.style.paddingRight
+
     if (isVisible) {
       // Chặn cuộn của trang ngoài khi popup mở
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth; // Độ rộng thanh cuộn
-      // document.body.style.position = 'fixed'; // Giữ trang cố định
-      // document.body.style.top = `-${window.scrollY}px`; // Giữ vị trí cuộn
-      // document.body.style.width = '100%'; // Ngăn cuộn ngang
-      document.body.style.paddingRight = `${scrollBarWidth}px`; // Để không bị mất không gian do thanh cuộn
-      document.body.style.overflowY = 'hidden';
-
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth // Độ rộng thanh cuộn
+      document.body.style.paddingRight = `${scrollBarWidth}px` // Để không bị mất không gian do thanh cuộn
+      document.body.style.overflowY = 'hidden'
     } else {
-      // Khi popup đóng, khôi phục lại cuộn cho trang ngoài
-      // const scrollY = document.body.style.top; // Vị trí cuộn trước
-      // document.body.style.position = ''; // Bỏ cố định
-      // document.body.style.top = ''; // Reset vị trí
-      // document.body.style.paddingRight = ''; // Bỏ padding
-      // window.scrollTo(0, parseInt(scrollY || '0') * -1); // Quay lại vị trí cuộn
-      document.body.style.overflowY = 'scroll';
+      document.body.style.overflowY = originalOverflowY
+      document.body.style.paddingRight = originalPaddingRight
     }
 
     return () => {
       // Cleanup
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.paddingRight = '';
-    };
-  }, [isVisible]);
-
+      document.body.style.overflowY = originalOverflowY
+      document.body.style.paddingRight = originalPaddingRight
+    }
+  }, [isVisible])
 
   if (!isVisible) return null
 
@@ -73,13 +57,13 @@ const PostPopup = ({ isVisible, onClose }: Props) => {
 
       {/* Popup */}
       <div
-        className={`${styles.popup} relative bg-white shadow-lg h-[680px] z-[1001] overflow-hidden grid grid-cols-[500px_500px]`}
+        className={`${styles.popup} relative bg-white shadow-lg h-[680px] z-10 overflow-hidden grid grid-cols-[500px_500px] rounded-xl`}
       >
-        <div className=''>
-          <Carousel images={slides} autoSlide={true} autoSlideInterval={3000}></Carousel>
+        <div className='border-r-[1px]'>
+          <Carousel imageAndVideo={postData?.imageAndVideo} autoSlide={true} autoSlideInterval={3000}></Carousel>
         </div>
-        <div className={`overflow-y-scroll ${styles.noScrollbar}`}>
-          <PopupComment />
+        <div className={`overflow-y-scroll ${styles.noScrollbar} rounded-xl`}>
+          <PopupComment postData={postData} isLiked={isLiked} onClose={onClose}/>
         </div>
       </div>
     </div>

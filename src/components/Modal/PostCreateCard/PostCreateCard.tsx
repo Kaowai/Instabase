@@ -1,23 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import styles from './PostCreateCard.module.css'
 import { BsImages } from 'react-icons/bs'
-import { FaArrowLeft } from 'react-icons/fa6'
-import { FaArrowRight } from 'react-icons/fa6'
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import Carousel from '../../Carousel/Carousel'
 import avatar2 from '../../../assets/avatar2.webp'
 import { UserResponse } from '../../../models/User/User.model'
 import { searchGlobalUserService } from '../../../apis/userService'
 import _ from 'lodash'
 import defaultAvatar from '../../../assets/default_avatar.jpg'
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
-import { storage } from '../../../config'
+import ClipLoader from 'react-spinners/ClipLoader'
+import { MdDone } from 'react-icons/md'
+import { uploadImage } from '../../../utils/uploadImage'
+import { createPost, updatePost } from '../../../apis/postService'
+import { motion } from 'framer-motion'
+import { Post } from '../../../models/post.model'
+
 type Props = {
   isVisible: boolean
   onClose: () => void
+  postData?: Post
+  isEdit?: boolean
+  refreshAfterEdit?: () => void
 }
 
-const PostCreateCard = ({ isVisible, onClose }: Props) => {
+const PostCreateCard = ({ isVisible, onClose, postData, isEdit = false, refreshAfterEdit = () => {} }: Props) => {
   const MAX_LENGTH = 1000
 
   const [step, setStep] = useState<number>(1)
@@ -25,12 +32,14 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   const [isShowSearch, setIsShowSearch] = useState<boolean>(false)
   const [inputContent, setInputContent] = useState<string>('') // Nội dung div nhập vào => dùng để debounce
   const [userSearch, setUserSearch] = useState<UserResponse[]>([])
-  const [keywordSearch, setKeyWordSearch] = useState<string>('')
+  const [keywordSearch, setKeyWordSearch] = useState<string>('') // Keyword use to search global user
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [htmlString, setHtmlString] = useState<string>('')
   const [listUserTag, setListUserTag] = useState<UserResponse[]>([])
+  const [listHagTag, setListHagTag] = useState<Array<string>>([])
   const [imageFiles, setImagesFiles] = useState<File[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     resetSetting()
@@ -77,6 +86,13 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   }, [debouncedKeyword])
 
   const resetSetting = () => {
+    if (isEdit && postData) {
+      setStep(3)
+      setImages(postData?.imageAndVideo)
+      setInputContent(postData?.postTitle)
+      setHtmlString(postData?.postTitle)
+      return
+    }
     setStep(1)
     setImages([])
     setInputContent('')
@@ -86,6 +102,8 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     setHtmlString('')
     setListUserTag([])
     setImagesFiles([])
+    setIsLoading(false)
+    setLoading(false)
   }
 
   const handleChooseImage = () => {
@@ -122,6 +140,7 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     }
     input.click()
   }
+
   const handleChooseUser = (user: UserResponse) => {
     setListUserTag((prev) => [...prev, user])
 
@@ -174,62 +193,74 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
     }
     setStep((pre) => pre - 1)
   }
+
   const handleNextStep = () => {
     setStep((pre) => pre + 1)
   }
 
   const handleSubmit = async () => {
-    if (imageFiles.length === 0) {
-      alert('No images to upload')
-      return
-    }
+    setStep((pre) => pre + 1)
+    setLoading(true)
 
-    const uploadedImageUrls: string[] = []
-
-    // Hiển thị thông báo hoặc trạng thái upload
-    setIsLoading(true)
-
-    try {
-      for (const file of imageFiles) {
-        const storageRef = ref(storage, `images/${file.name}-${Date.now()}`)
-        const uploadTask = uploadBytesResumable(storageRef, file)
-
-        // Quản lý tiến trình tải lên
-        await new Promise<void>((resolve, reject) => {
-          uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-              console.log(`Upload is ${progress}% done`)
-            },
-            (error) => {
-              console.error('Upload failed:', error)
-              reject(error)
-            },
-            async () => {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-              uploadedImageUrls.push(downloadURL)
-              resolve()
-            }
-          )
+    if (isEdit) {
+      try {
+        const uploadedImageUrls = await uploadImage(imageFiles)
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}')
+        let postTitle = inputContent
+        listUserTag?.forEach((user) => {
+          postTitle = postTitle.replace(`${user.nickName}`, `@${user.nickName}@`)
         })
+        postTitle.replace('\\n', '')
+        console.log(postTitle)
+        const req = {
+          postId: postData?.postId,
+          userId: user.userId,
+          postTitle: postTitle,
+          imageAndVideo: uploadedImageUrls,
+          listHagtag: listHagTag
+        }
+
+        console.log('Request:', req)
+        // Step 3: Call API to save post to the database
+        const response = await updatePost(req)
+        console.log('Create post response:', response)
+      } catch (err) {
+        console.log(err)
+      } finally {
+        // Ensure loading spinner is hidden
+        setLoading(false)
+        refreshAfterEdit()
       }
+    } else {
+      try {
+        // Step 1: Upload images
+        const uploadedImageUrls = await uploadImage(imageFiles)
 
-      // Sau khi upload tất cả ảnh, xử lý tiếp dữ liệu (e.g., lưu vào database)
-      console.log('Uploaded image URLs:', uploadedImageUrls)
-
-      // Reset dữ liệu
-      setImages([])
-      setImagesFiles([])
-      resetSetting()
-
-      // Thông báo thành công
-      alert('Images uploaded successfully!')
-    } catch (error) {
-      console.error('Error uploading images:', error)
-      alert('Failed to upload images. Please try again.')
-    } finally {
-      setIsLoading(false)
+        // Step 2: Prepare request payload
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}')
+        let postTitle = inputContent
+        listUserTag?.forEach((user) => {
+          postTitle = postTitle.replace(`${user.nickName}`, `@${user.nickName}@`)
+        })
+        postTitle.replace('\\n', '')
+        console.log(postTitle)
+        const req = {
+          userId: user.userId,
+          postTitle: postTitle,
+          imageAndVideo: uploadedImageUrls,
+          listHagTag: listHagTag
+        }
+        console.log('Request:', req)
+        // Step 3: Call API to save post to the database
+        const response = await createPost(req)
+        console.log('Create post response:', response)
+      } catch (error) {
+        // Handle errors from both `uploadImage` and `createPost`
+        console.error('Error:', error)
+      } finally {
+        // Ensure loading spinner is hidden
+        setLoading(false)
+      }
     }
   }
 
@@ -257,132 +288,214 @@ const PostCreateCard = ({ isVisible, onClose }: Props) => {
   if (!isVisible) return null
 
   return (
-    <div className='fixed overflow-y-hidden box-border inset-0 z-[1000] flex items-center justify-center'>
-      {/* Lớp phủ mờ */}
+    <div className='fixed overflow-y-hidden box-border inset-0 z-[1001] flex items-center justify-center'>
+      {/* Overlay */}
       <div className='absolute box-border inset-0 bg-black bg-opacity-50' onClick={onClose}></div>
-      <div className=' fixed top-1 right-1 cursor-pointer' onClick={onClose}>
+
+      {/* Close button */}
+      <div className='fixed top-1 right-1 cursor-pointer' onClick={onClose}>
         <IoMdClose size={28} fill='white' />
       </div>
-      {/* Popup */}
-      <div
-        className={`${styles.popup} relative rounded-xl bg-white shadow-lg ${step !== 3 ? 'w-[520px]' : 'w-[900px]'} h-[550px] z-[1001] overflow-hidden`}
-      >
-        {/* Header */}
 
-        <div className='absolute flex justify-center items-center h-12 border-b-[1px] border-grey-color3 w-full '>
-          {step === 1 && <span className='font-bold text-base'>Create new post</span>}
+      {/* Popup */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className={`${styles.popup} relative rounded-xl bg-white shadow-lg 
+                   ${step !== 3 ? 'w-[520px]' : 'w-[900px]'} h-[550px] z-10 overflow-hidden`}
+      >
+        {/* Header with motion */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='absolute flex justify-center items-center h-12 border-b-[1px] border-grey-color3 w-full'
+        >
+          {step === 1 && <span className='font-semibold text-xl'>Create new post</span>}
           {step === 2 && (
             <div className='w-full flex justify-between items-center px-4'>
               <FaArrowLeft size={16} className='cursor-pointer' onClick={handleBackStep} />
-              <span className='font-bold text-base'>Crop</span>
+              <span className='font-semibold text-xl'>Crop</span>
               <FaArrowRight size={16} className='cursor-pointer' onClick={handleNextStep} />
             </div>
           )}
           {step === 3 && (
             <div className='w-full flex justify-between items-center px-4'>
               <FaArrowLeft size={16} className='cursor-pointer' onClick={handleBackStep} />
-              <span className='font-bold text-base'>Complete</span>
+              <span className='font-semibold text-xl'>Complete</span>
               <span className='font-bold text-blue-600 cursor-pointer hover:text-blue-800' onClick={handleSubmit}>
                 Share
               </span>
             </div>
           )}
-        </div>
+          {step === 4 && <span className='font-semibold text-xl'>Shared post</span>}
+        </motion.div>
 
         {/* Content create new post */}
         <div className={`w-full mt-12 h-full ${step === 3 && 'grid grid-cols-[520px_380px]'}`}>
           <div
-            className={` w-full h-full flex justify-center items-center flex-col ${styles.noScrollbar} overflow-y-scroll`}
+            className={`w-full h-full flex justify-center items-center flex-col ${styles.noScrollbar} overflow-y-scroll`}
           >
-            {/* First step, drag or choose image */}
+            {/* First step */}
             {step === 1 && (
-              <div className='w-full h-full flex justify-center flex-col items-center gap-4'>
-                <BsImages size={72} />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='w-full h-full flex justify-center flex-col items-center gap-4'
+              >
+                <BsImages size={72} className='text-gray-400' />
                 <span className='text-xl font-light'>Drag or choose image</span>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleChooseImage}
-                  className='py-2 px-4 font-medium text-white rounded-lg bg-blue-600 hover:bg-blue-900 cursor-pointer outline-none border-none'
+                  className='py-2 px-4 font-medium text-white rounded-lg bg-blue-600 
+                           hover:bg-blue-700 transition-colors duration-200
+                           cursor-pointer outline-none border-none'
                 >
                   Select from computer
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             )}
 
-            {/* Second step, display selected images */}
+            {/* Second step */}
             {step === 2 && (
-              <div className='w-full h-full flex flex-col items-center gap-4'>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className='w-full h-full flex flex-col items-center gap-4'
+              >
                 <div className='grid grid-cols-3 gap-4'>
                   {images.map((image, index) => (
-                    <div key={index} className='relative'>
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                      className='relative'
+                    >
                       <img src={image} alt={`Selected ${index}`} className='w-full h-auto rounded-lg' />
-                      <button
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         onClick={() => setImages((prevImages) => prevImages.filter((_, i) => i !== index))}
-                        className='absolute top-1 right-1 bg-grey-color3 flex justify-center items-center hover:bg-grey-color2 text-white rounded-full p-1'
+                        className='absolute top-1 right-1 p-2 bg-gray-800/50 hover:bg-gray-800/75 
+                                 backdrop-blur-sm transition-colors duration-200
+                                 rounded-full flex items-center justify-center'
                       >
                         <IoMdClose size={16} fill='white' />
-                      </button>
-                    </div>
+                      </motion.button>
+                    </motion.div>
                   ))}
                 </div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleAddImage}
-                  className='py-2 px-4 font-medium text-white rounded-lg bg-blue-600 hover:bg-blue-900 cursor-pointer outline-none border-none'
+                  className='py-2 px-4 font-medium text-white rounded-lg bg-blue-600 
+                           hover:bg-blue-700 transition-colors duration-200
+                           cursor-pointer outline-none border-none'
                 >
                   Add more images
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             )}
+
+            {/* Step 3 and 4 with motion */}
             {step === 3 && (
-              <div className='w-[520px] h-full'>
-                <Carousel images={images} isCreate={true} autoSlide={true} />
-              </div>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='w-[520px] h-full'>
+                <Carousel imageAndVideo={images} isCreate={true} autoSlide={true} />
+              </motion.div>
             )}
-          </div>
-          <div className='border-l-[1px] border-grey-color3 w-full'>
-            <div className='flex justify-start items-center gap-2 p-4'>
-              <img className={`w-10 h-10 rounded-[90px] object-cover`} src={avatar2} alt='' />
-              <span className='font-medium'>hoaiisreal</span>
-            </div>
-            <div className=' px-4 border-b-[1px] border-grey-color3'>
-              <div
-                contentEditable='true'
-                onInput={handleChange}
-                dangerouslySetInnerHTML={{ __html: htmlString }}
-                className={`resize-none w-[350px] h-48 overflow-y-scroll ${styles.noScrollbar} outline-none font-normal`}
-              ></div>
-            </div>
-            {isShowSearch && (
-              <div className={`overflow-y-scroll ${styles.noScrollbar} w-full border-2 h-56`}>
-                {isLoading ? (
-                  <div className='flex justify-center items-center h-full'>
-                    <span>Loading...</span> {/* Hoặc một spinner */}
-                  </div>
+
+            {step === 4 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className='w-full h-full flex justify-center items-center'
+              >
+                {loading ? (
+                  <ClipLoader
+                    color='black'
+                    loading={loading}
+                    size={64}
+                    aria-label='Loading Spinner'
+                    data-testid='loader'
+                  />
                 ) : (
-                  <ul>
-                    {userSearch.map((user) => (
-                      <li
-                        key={user.userId}
-                        onClick={() => handleChooseUser(user)}
-                        className='list-none gap-2 p-1 cursor-pointer w-full border-b-[1px] border-grey-color3 flex justify-start items-center hover:bg-grey-color1'
-                      >
-                        <img
-                          className={`w-8 h-8 rounded-[90px] object-cover`}
-                          src={user.avatar || defaultAvatar}
-                          alt=''
-                        />
-                        <div className='flex flex-col justify-start items-start'>
-                          <span className='font-bold'>{user?.nickName}</span>
-                          <span className='font-normal'>{user?.fullName}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className='w-full h-full flex justify-center flex-col items-center gap-4'
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200 }}
+                      className='rounded-full border-2 border-black p-4'
+                    >
+                      <MdDone size={64} />
+                    </motion.div>
+                    <span className='text-xl font-medium'>Your post has been shared</span>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
+
+          {/* Right side panel with motion */}
+          {step === 3 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className='border-l-[1px] border-grey-color3 w-full'
+            >
+              <div className='flex justify-start items-center gap-2 p-4'>
+                <img className={`w-10 h-10 rounded-[90px] object-cover`} src={avatar2} alt='' />
+                <span className='font-medium'>hoaiisreal</span>
+              </div>
+              <div className=' px-4 border-b-[1px] border-grey-color3'>
+                <div
+                  contentEditable='true'
+                  onInput={handleChange}
+                  dangerouslySetInnerHTML={{ __html: htmlString }}
+                  className={`resize-none w-[350px] h-48 overflow-y-scroll ${styles.noScrollbar} font-normal outline-none`}
+                ></div>
+              </div>
+              {isShowSearch && (
+                <div className={`overflow-y-scroll ${styles.noScrollbar} w-full border-2 h-56`}>
+                  {isLoading ? (
+                    <div className='flex justify-center items-center p-4'>
+                      <ClipLoader size={20} />
+                    </div>
+                  ) : (
+                    <ul>
+                      {userSearch.map((user) => (
+                        <li
+                          key={user.userId}
+                          onClick={() => handleChooseUser(user)}
+                          className='list-none gap-2 p-1 cursor-pointer w-full border-b-[1px] border-grey-color3 flex justify-start items-center hover:bg-grey-color1'
+                        >
+                          <img
+                            className={`w-8 h-8 rounded-[90px] object-cover`}
+                            src={user.avatar || defaultAvatar}
+                            alt=''
+                          />
+                          <div className='flex flex-col justify-start items-start'>
+                            <span className='font-bold'>{user?.nickName}</span>
+                            <span className='font-normal'>{user?.fullName}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -1,31 +1,24 @@
 import styles from './AccountSearch.module.css'
 import avatar from './../../assets/avatar.png'
+import { UserResponse } from '../../models/User/User.model'
 
-interface InfoSearch {
-  nameAccount?: string
-  name?: string
-  isFollow?: boolean
-  isHaveStory?: boolean
-  imageAccount?: string
+interface AccountSearchProps {
+  user: UserResponse
+  onClick?: () => void
 }
 
-const AccountSearch = ({ nameAccount, name, isFollow, isHaveStory }: InfoSearch): React.JSX.Element => {
+const AccountSearch = ({ user, onClick }: AccountSearchProps): React.JSX.Element => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={onClick}>
       <div>
         <div className={styles.containerImage}>
-          <div className={`${isHaveStory && styles.avatar_wrapper}`}>
-            <img className={styles.imageSearch} src={avatar} alt='' />
-          </div>
+          <div className={``}>{<img className={styles.imageSearch} src={avatar} alt='' />}</div>
         </div>
         <div className={styles.content}>
-          <span className={styles.nameAccount}>{nameAccount}</span>
-          <span className={styles.infoAccount}>{isFollow ? 'Following' : name}</span>
+          <span className={styles.nameAccount}>{user?.nickName}</span>
+          <span className={styles.infoAccount}>{user?.fullName}</span>
         </div>
       </div>
-      <button>
-        <span className='material-symbols-sharp md-24'>close</span>
-      </button>
     </div>
   )
 }

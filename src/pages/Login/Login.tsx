@@ -36,8 +36,8 @@ const Login = () => {
   })
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId')
-    if (userId) {
+    const user = sessionStorage.getItem('user')
+    if (JSON.parse(user)) {
       navigate('/', { replace: true }) // Chuyển hướng nếu đã xác thực
     } else {
       setIsCheckingAuth(false) // Cho phép hiển thị form login
@@ -48,7 +48,7 @@ const Login = () => {
     setLoading(true)
     try {
       const response = await loginService(data.email, data.password)
-      localStorage.setItem('userId', response.userId)
+      sessionStorage.setItem('user', JSON.stringify(response))
       navigate('/', { replace: true }) // Điều hướng sau khi đăng nhập thành công
     } catch (err: any) {
       console.log(err)
@@ -109,6 +109,15 @@ const Login = () => {
             Log in
           </button>
         </form>
+      </div>
+      <div className='w-[350px] border-[1px] border-grey-color3 flex items-center justify-center gap-2 p-8'>
+        <span className='text-grey-color2'>Don't have any account?</span>
+        <span
+          onClick={() => navigate('/signup')}
+          className='text-blue-600 hover:text-blue-800 font-semibold cursor-pointer'
+        >
+          Sign Up
+        </span>
       </div>
     </div>
   )

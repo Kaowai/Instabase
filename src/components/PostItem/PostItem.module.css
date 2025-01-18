@@ -1,8 +1,8 @@
 .containerItem {
-  width: 320px;
-  height: 320px;
+  width: 100%;
+  height: 100%;
   position: relative;
-  background-color: bisque;
+  background-color: #bdbdbd;
   overflow: hidden;
   cursor: pointer;
   box-shadow: none;
@@ -30,6 +30,7 @@
   height: 100%;
   position: relative;
   z-index: 0;
+  object-fit: cover;
 }
 
 .react {
@@ -54,14 +55,14 @@
 }
 
 .comment > span:last-child {
-  font-size: 1.1rem;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .comment {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   flex-direction: row;
 }

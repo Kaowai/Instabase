@@ -1,0 +1,36 @@
+.noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.noScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.reelsContainer {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.videoSection {
+  flex: 1;
+  background: black;
+  position: relative;
+  max-width: 400px;
+}
+
+.inputSection {
+  width: calc(100% - 400px);
+  border-left: 1px solid #dbdbdb;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

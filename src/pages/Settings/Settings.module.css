@@ -1,0 +1,32 @@
+.settings-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h2 {
+  margin-bottom: 10px;
+}
+
+.settings-section input {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 100%;
+}
+
+.settings-section button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.settings-section button:hover {
+  background-color: #0056b3;
+}

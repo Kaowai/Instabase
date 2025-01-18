@@ -7,3 +7,11 @@ export interface UserResponse {
   avatar: string
   fbId: string
 }
+
+export interface User {
+  userId: string
+  nickName: string
+  fullName: string
+  avatar: string
+  isFollowing?: boolean
+}

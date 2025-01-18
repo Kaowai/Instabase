@@ -123,3 +123,8 @@ mark {
   color: transparent;
   background-color: #b1d5e5;
 }
+
+.highlight-text {
+  color: #3498db;
+  font-weight: 500;
+}

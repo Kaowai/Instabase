@@ -1,11 +1,11 @@
-import { UserResponse } from '../models/User/User.model'
-import appClient from './api'
-
+import { Post } from '../models/post.model'
+import { User, UserResponse } from '../models/User/User.model'
+import { authClient } from './api'
 // ** Search global user
 // ********************************************
 export const searchGlobalUserService = async (searchKey: string): Promise<UserResponse[]> => {
   try {
-    const response = await appClient.get(`/users/search/${searchKey}`)
+    const response = await authClient.get(`/users/search/${searchKey}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -15,9 +15,9 @@ export const searchGlobalUserService = async (searchKey: string): Promise<UserRe
 
 // ** Get user followers
 // ********************************************
-export const getUserFollow = async (userId: string): Promise<UserResponse[]> => {
+export const getUserFollow = async (userId: string): Promise<User[]> => {
   try {
-    const response = await appClient.get(`/users/followers/${userId}`)
+    const response = await authClient.get(`/users/followers/${userId}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -27,9 +27,9 @@ export const getUserFollow = async (userId: string): Promise<UserResponse[]> => 
 
 // ** Get user followers
 // ********************************************
-export const getUserFollowing = async (userId: string): Promise<UserResponse[]> => {
+export const getUserFollowing = async (userId: string): Promise<User[]> => {
   try {
-    const response = await appClient.get(`/users/following/${userId}`)
+    const response = await authClient.get(`/users/following/${userId}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -41,7 +41,7 @@ export const getUserFollowing = async (userId: string): Promise<UserResponse[]> 
 // ********************************************
 export const getUserById = async (userId: string): Promise<UserResponse> => {
   try {
-    const response = await appClient.get(`/users/${userId}`)
+    const response = await authClient.get(`/users/${userId}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -53,7 +53,7 @@ export const getUserById = async (userId: string): Promise<UserResponse> => {
 // ********************************************
 export const getUsersRecommend = async (userId: string): Promise<UserResponse[]> => {
   try {
-    const response = await appClient.get(`/users/${userId}`)
+    const response = await authClient.get(`/users/${userId}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -61,9 +61,9 @@ export const getUsersRecommend = async (userId: string): Promise<UserResponse[]>
   }
 }
 
-export const getUserByNickName = async (nickName: string): Promise<UserResponse> => {
+export const getUserByNickName = async (nickName: string): Promise<User> => {
   try {
-    const response = await appClient.get(`/users/nickName/${nickName}`)
+    const response = await authClient.get(`/users/nickName/${nickName}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -73,7 +73,7 @@ export const getUserByNickName = async (nickName: string): Promise<UserResponse>
 
 export const searchFriendByFullName = async (userId: string, fullName: string): Promise<UserResponse> => {
   try {
-    const response = await appClient.get(`/users/friends/${userId}/${fullName}`)
+    const response = await authClient.get(`/users/friends/${userId}/${fullName}`)
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -83,7 +83,7 @@ export const searchFriendByFullName = async (userId: string, fullName: string): 
 
 export const followUserSerice = async (selfId: string, userFollowId: string): Promise<string> => {
   try {
-    const response = await appClient.post('/users/follow', { selfId, userFollowId })
+    const response = await authClient.post('/users/follow', { selfId, userFollowId })
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -93,10 +93,37 @@ export const followUserSerice = async (selfId: string, userFollowId: string): Pr
 
 export const unFollowUserSerice = async (selfId: string, userFollowId: string): Promise<string> => {
   try {
-    const response = await appClient.post('/users/unfollow', { selfId, userFollowId })
+    const response = await authClient.post('/users/unfollow', { selfId, userFollowId })
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     throw error.response?.data?.message || 'Error'
+  }
+}
+
+export const getRecommnedUser = async (userId: string): Promise<User[]> => {
+  try {
+    const response = await authClient.get(`/users/recommend/${userId}`)
+    return response.data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw error.response?.data || 'Error'
+  }
+}
+
+export const updateUserInfo = async (user: Partial<User>): Promise<User> => {
+  try {
+    const response = await authClient.put(`/users/${user.userId}`, user)
+    return response.data
+  } catch (error: any) {
+    throw error.response?.data || 'Error'
+  }
+}
+
+export const updateUserPassword = async (userId: string, newPassword: string): Promise<void> => {
+  try {
+    await authClient.put(`/users/${userId}/password`, { newPassword })
+  } catch (error: any) {
+    throw error.response?.data || 'Error'
   }
 }

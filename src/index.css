@@ -14,10 +14,10 @@
   --grey-color3: #dbdbdb;
 }
 * {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-optical-sizing: auto;
-  font-weight: 300;
-  font-size: 0.9rem;
+  font-weight: 400;
+  font-size: 0.92rem;
   color: black;
   padding: 0;
   margin: 0;
@@ -81,4 +81,68 @@
     'wght' 400,
     'GRAD' 0,
     'opsz' 40;
+}
+
+.customScrollbar {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #888 transparent; /* For Firefox */
+}
+
+.customScrollbar::-webkit-scrollbar {
+  width: 6px; /* Width of the scrollbar */
+}
+
+.customScrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Track color */
+  border-radius: 10px;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* Handle color */
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Handle color on hover */
+}
+
+.customRadio {
+  position: relative;
+  cursor: pointer;
+  padding-left: 25px;
+  user-select: none;
+}
+
+.checkmark {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  height: 24px;
+  width: 24px;
+  border: 2px solid #efefef;
+  border-radius: 50%;
+}
+
+.customRadio input:checked ~ .checkmark {
+  background-color: white;
+  border: 2px solid #0095f6;
+}
+
+.checkmark:after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+.customRadio input:checked ~ .checkmark:after {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #0095f6;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
