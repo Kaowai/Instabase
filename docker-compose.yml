@@ -1,0 +1,113 @@
+version: "3.9"
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml
+    command:
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+    depends_on:
+      - userservice
+      - postservice
+      - storyservice
+      - notificationservice
+      - chatservice
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433" # Cổng mặc định của SQL Server
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd" # Đặt mật khẩu mạnh
+      ACCEPT_EULA: "Y"                   # Chấp nhận điều khoản sử dụng
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "15673:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  userservice:
+    image: namdam1123/userservice
+    container_name: userservice
+    ports:
+      - "32678:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.userservice.rule=PathPrefix(/api/users)"  # Định tuyến theo path
+      - "traefik.http.services.userservice.loadbalancer.server.port=8080"
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    environment:
+      RABBITMQ_HOST: rabbitmq
+
+  postservice:
+    image: namdam1123/postservice
+    container_name: postservice
+    ports:
+      - "32679:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.postservice.rule=PathPrefix(/api/posts)" # Định tuyến theo path
+      - "traefik.http.services.postservice.loadbalancer.server.port=8080"
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    environment:
+      RABBITMQ_HOST: rabbitmq
+
+  storyservice:
+    image: namdam1123/storyservice
+    container_name: storyservice
+    ports:
+      - "32680:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.storyservice.rule=PathPrefix(/api/stories)" # Định tuyến theo path
+      - "traefik.http.services.storyservice.loadbalancer.server.port=8080"
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    environment:
+      RABBITMQ_HOST: rabbitmq
+
+  notificationservice:
+    image: namdam1123/notificationservice
+    container_name: notificationservice
+    ports:
+      - "32681:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notificationservice.rule=PathPrefix(/api/notifications)" # Định tuyến theo path
+      - "traefik.http.services.notificationservice.loadbalancer.server.port=8080"
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    environment:
+      RABBITMQ_HOST: rabbitmq
+  chatservice:
+    image: namdam1123/chatservice
+    container_name: chatservice
+    ports:
+      - "32682:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chatservice.rule=PathPrefix(/api/chat)" # Định tuyến theo path
+      - "traefik.http.services.chatservice.loadbalancer.server.port=8080"
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    environment:
+      RABBITMQ_HOST: rabbitmq
