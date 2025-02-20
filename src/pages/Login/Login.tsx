@@ -68,7 +68,7 @@ const Login = () => {
 
   // Form đăng nhập
   return (
-    <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center'>
+    <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center border border-red-500'>
       <div className='w-[350px] h-[410px] border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
         {/* Logo */}
         <div className='flex h-32 justify-center items-center w-full'>

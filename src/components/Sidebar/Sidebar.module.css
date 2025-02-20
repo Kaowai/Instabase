@@ -19,15 +19,17 @@ ul {
   gap: 10px;
 }
 
-:global(.logo) {
-  font-family: 'Satisfy', cursive;
+.logo {
+  font-family: "Sacramento", serif;
   font-weight: normal;
   font-style: normal;
   margin-top: 1rem;
-  font-size: 2.4rem;
+  font-weight: bold;
+  font-size: 3.2rem;
+  cursor: pointer;
   display: flex;
   justify-content: start;
-  padding: 10px;
+  padding: 20px;
 }
 
 .menuItem {

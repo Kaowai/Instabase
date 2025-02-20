@@ -1,5 +1,6 @@
 import styles from './sidebar.module.css'
 import avatar from './../../assets/avatar.png'
+import logo from './../../assets/instagram.png'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { GoHome } from 'react-icons/go'
@@ -97,7 +98,7 @@ const MenuList: Array<Menu> = [
 const LogoApp: Menu = {
   name: 'Instacloud',
   path: '/',
-  icon: [<span className='material-symbols-sharp md-32'>water_drop</span>]
+  icon: [<img className='h-6 w-6' src={logo} />]
 }
 
 const Sidebar = ({
@@ -217,7 +218,7 @@ const Sidebar = ({
             key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
           >
             {isOpen ? (
-              <div className={'logo'}>Instacloud</div>
+              <div className={styles.logo}>Instacloud</div>
             ) : (
               <div style={{ marginBottom: '20px', marginTop: '1rem' }}>
                 <MenuItem
