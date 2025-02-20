@@ -20,11 +20,10 @@ ul {
 }
 
 .logo {
-  font-family: "Sacramento", serif;
+  font-family: "Cookie", serif;
   font-weight: normal;
   font-style: normal;
   margin-top: 1rem;
-  font-weight: bold;
   font-size: 3.2rem;
   cursor: pointer;
   display: flex;

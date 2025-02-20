@@ -166,7 +166,7 @@ const Sidebar = ({
 
   const handleLogout = () => {
     sessionStorage.clear()
-    navigate('/login')
+    window.location.reload()
   }
 
   const handleCreateOption = (option: 'post' | 'story' | 'reel') => {
@@ -218,7 +218,7 @@ const Sidebar = ({
             key={isOpen ? 'logo' : 'menuItem'} // Add unique keys for each state
           >
             {isOpen ? (
-              <div className={styles.logo}>Instacloud</div>
+              <div className={styles.logo}>Instagram</div>
             ) : (
               <div style={{ marginBottom: '20px', marginTop: '1rem' }}>
                 <MenuItem
