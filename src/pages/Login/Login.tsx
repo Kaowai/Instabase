@@ -27,12 +27,13 @@ const schema = yup
 const Login = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true) // Trạng thái kiểm tra
+  const [isLoginError, setIsLoginError] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm({
     resolver: yupResolver(schema)
   })
@@ -53,10 +54,13 @@ const Login = () => {
       sessionStorage.setItem('user', JSON.stringify(response))
       navigate('/', { replace: true }) // Điều hướng sau khi đăng nhập thành công
     } catch (err: any) {
-      console.log(err)
+      setIsLoginError(true);
     } finally {
       setLoading(false)
     }
+  }
+  const onFocus = () => {
+    setIsLoginError(false)
   }
 
   // Hiển thị màn hình tải trong khi kiểm tra xác thực
@@ -101,6 +105,7 @@ const Login = () => {
                 <input
                   type='email'
                   autoFocus
+                  onFocus={onFocus}
                   autoComplete='off'
                   {...register('email')}
                   placeholder='Email'
@@ -111,6 +116,7 @@ const Login = () => {
               <div className='w-full'>
                 <input
                   type='password'
+                  onFocus={onFocus}
                   autoComplete='off'
                   {...register('password')}
                   placeholder='Password'
@@ -118,8 +124,14 @@ const Login = () => {
                 />
                 {errors.password && <p className='errors'>{errors.password.message}</p>}
               </div>
+              {
+                isLoginError && (
+                  <div className='w-full'><p className='text-sm font-semibold'>*Authentication failed</p></div>
+                )
+              }
               <button
                 type='submit'
+                disabled={isLoginError || isValid}
                 className='text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3'
               >
                 Log in
