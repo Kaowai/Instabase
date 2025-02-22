@@ -31,8 +31,7 @@ const schema = yup.object().shape({
     .matches(
       /^[a-zA-Z0-9._]{6,50}$/,
       'Username must not contain special characters except . and _ and must not contain spaces'
-    ),
-  isAgreePolicy: yup.boolean().oneOf([true], 'You must agree to the terms and conditions')
+    )
 })
 
 interface SignupInput {
@@ -46,6 +45,7 @@ const Signup = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true) // Trạng thái kiểm tra
   const [error, setError] = useState<string>('')
+  const [isSignupError, setIsSignupError] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const {
@@ -66,43 +66,54 @@ const Signup = () => {
   }, [])
 
   const onSubmit = async (data: SignupInput): Promise<void> => {
-    setLoading(true)
+    const defaultImage =
+      "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
+  
     try {
-      const response = await signUpService(data.email, data.password)
-      const defaultImage =
-        'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg'
-      const response2 = await setNameAndAvatarService(response.userId, data.fullName, defaultImage)
-      const response3 = await setNickNameUserService(response.userId, data.userName)
-      const response4 = await loginService(data.email, data.password)
-      sessionStorage.setItem('user', JSON.stringify(response4))
-
-      navigate('/', { replace: true }) // Điều hướng sau khi đăng nhập thành công
+      setLoading(true);
+  
+      // Đăng ký tài khoản
+      const user = await signUpService(data.email, data.password);
+  
+      // Cập nhật thông tin người dùng (chạy song song)
+      await Promise.all([
+        setNameAndAvatarService(user.userId, data.fullName, defaultImage),
+        setNickNameUserService(user.userId, data.userName),
+      ]);
+  
+      // Đăng nhập và lấy thông tin
+      const loginData = await loginService(data.email, data.password);
+      sessionStorage.setItem('user', JSON.stringify(loginData))
+      
     } catch (err) {
-      setError(err?.detail || 'Register failed')
-      console.log(err)
+      setError((err?.detail as string) || "Register failed");
+      setIsSignupError(true)
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  };
+  const onFocus = () => {
+    setIsSignupError(false)
   }
 
-  if (isCheckingAuth) {
-    return (
-      <div className='flex items-center justify-center h-screen'>
-        <p>Loading...</p>
-      </div>
-    )
-  }
+    if (isCheckingAuth) {
+      return (
+        <div className='flex items-center justify-center h-screen'>
+          <p>Loading...</p>
+        </div>
+      )
+    }
   return (
     <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center'>
       <div className='w-[350px] h-full border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
         {/* Logo */}
         <div className=' flex h-20 mt-8 justify-center items-center w-full'>
-          <span className='logo'>Instacloud</span>
+          <span className='logo'>Instagram</span>
         </div>
 
         {/* Title */}
         <div className='flex justify-center items-center w-full'>
-          <span className='text-base font-medium text-black text-center '>
+          <span className='text-center font-semibold text-grey-color2 text-[1.1rem]'>
             Sign up to see photos and videos from your friends.
           </span>
         </div>
@@ -115,8 +126,9 @@ const Signup = () => {
           <div className='w-full'>
             <input
               type='email'
+              onFocus={onFocus}
               {...register('email')}
-              autoComplete='off'
+              autoComplete='new-email'
               placeholder='Email'
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
             />
@@ -124,8 +136,9 @@ const Signup = () => {
           </div>
           <div className='w-full'>
             <input
+              onFocus={onFocus}
               type='password'
-              autoComplete='off'
+              autoComplete='new-password'
               placeholder='Password'
               {...register('password')}
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
@@ -135,7 +148,8 @@ const Signup = () => {
           <div className='w-full'>
             <input
               type='password'
-              autoComplete='off'
+              onFocus={onFocus}
+              autoComplete='new-confirm-password'
               placeholder='Confirm password'
               {...register('confirmPassword')}
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
@@ -145,7 +159,8 @@ const Signup = () => {
           <div className='w-full'>
             <input
               type='text'
-              autoComplete='off'
+              autoComplete='new-full-name'
+              onFocus={onFocus}
               placeholder='Full Name'
               {...register('fullName')}
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
@@ -155,29 +170,23 @@ const Signup = () => {
           <div className='w-full'>
             <input
               type='text'
+              onFocus={onFocus}
               placeholder='Username'
-              autoComplete='off'
+              autoComplete='new-username'
               {...register('userName')}
               className='border-[1px] placeholder:text-gray-400 p-2 text-sm rounded-sm border-grey-color3 outline-none focus:border-grey-color2 w-full h-10'
             />
             {errors.userName && <p className='errors'>{errors.userName.message}</p>}
           </div>
+          {isSignupError && (<p className='errors w-full'>{error}</p>)}
           <div className='w-full justify-start flex items-start gap-2 mt-1 flex-col'>
             <div className='flex items-start gap-2'>
-              <input type='checkbox' className='mt-1' {...register('isAgreePolicy')} />
-
-              <label htmlFor='term' className='font-light text-sm text-gray-600'>
+              <p className='text-center font-light text-sm text-gray-600'>
                 By sign up, you agree to our Terms, Privacy Policy and Cookies Policy .
-              </label>
+              </p>
             </div>
-            {errors.isAgreePolicy && <p className='errors'>{errors.isAgreePolicy.message}</p>}
           </div>
-          {error && (
-            <div className='w-full justify-start flex items-start gap-2 mt-1'>
-              <p className='errors '>{error}</p>
-            </div>
-          )}
-
+          
           <button
             type='submit'
             disabled={loading || Object.keys(errors).length > 0}

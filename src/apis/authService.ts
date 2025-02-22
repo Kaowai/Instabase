@@ -27,6 +27,7 @@ export const setNameAndAvatarService = async (userId: string, name: string, avat
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    console.log(error.response)
     throw error.response?.data || 'Error'
   }
 }
@@ -37,6 +38,7 @@ export const setNickNameUserService = async (userId: string, nickname: string): 
     return response.data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    console.log(error.response)
     throw error.response?.data || 'Error'
   }
 }

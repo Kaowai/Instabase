@@ -18,9 +18,6 @@ const schema = yup
     password: yup
       .string()
       .required('Password is required')
-      .min(6, 'Password must be at least 6 characters')
-      .max(20, 'Password must be at most 20 characters')
-      .matches(/^[a-zA-Z0-9]{6,20}$/, 'Password must be alphanumeric with no special characters')
   })
   .required()
 
@@ -54,6 +51,7 @@ const Login = () => {
       sessionStorage.setItem('user', JSON.stringify(response))
       navigate('/', { replace: true }) // Điều hướng sau khi đăng nhập thành công
     } catch (err: any) {
+      console.log(err)
       setIsLoginError(true);
     } finally {
       setLoading(false)
@@ -126,13 +124,13 @@ const Login = () => {
               </div>
               {
                 isLoginError && (
-                  <div className='w-full'><p className='text-sm font-semibold'>*Authentication failed</p></div>
+                  <div className='w-full'><p className='text-xs text-red-500 font-semibold'>*Your password or email was incorrect. Please check your password.</p></div>
                 )
               }
               <button
                 type='submit'
-                disabled={isLoginError || isValid}
-                className='text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3'
+                disabled={isLoginError}
+                className={`text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3 disabled:cursor-default`}
               >
                 Log in
               </button>
