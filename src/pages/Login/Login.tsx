@@ -73,19 +73,19 @@ const Login = () => {
   // Form đăng nhập
   return (
     <div className='w-screen h-screen'>
-      <div className='grid grid-cols-2 h-full w-full p-8'>
-        <div className='w-full flex h-full gap-2 relative  justify-center'>
+      <div className='grid w-full h-full grid-cols-2 p-8'>
+        <div className='relative flex justify-center w-full h-full gap-2'>
           <div className='flex items-center'>
             <img className='object-contain max-h-[500px]  max-w-1/2 pl-20' src={phone1} loading='lazy' alt="home screen" />
           </div>
-          <div className='h-full w-1/2 max-w-1/2 absolute right-8 top-2 flex items-center justify-end'>
+          <div className='absolute flex items-center justify-end w-1/2 h-full max-w-1/2 right-8 top-2'>
             <img className='object-contain max-h-[500px] max-w-1/2' src={phone2} loading='lazy' alt="explore screen" />
           </div>
         </div>
-        <div className='flex flex-col gap-6 justify-center items-start '>
+        <div className='flex flex-col items-start justify-center gap-6 '>
           <div className='w-[350px] h-[410px] border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
             {/* Logo */}
-            <div className='flex h-28 justify-center items-center w-full'>
+            <div className='flex items-center justify-center w-full h-28'>
               <span className='logo'>Instagram</span>
             </div>
             <div>
@@ -95,7 +95,7 @@ const Login = () => {
             {/* Form */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className='py-4 flex w-full justify-center items-center flex-col gap-2'
+              className='flex flex-col items-center justify-center w-full gap-2 py-4'
               noValidate
               autoComplete="off"
             >
@@ -124,7 +124,7 @@ const Login = () => {
               </div>
               {
                 isLoginError && (
-                  <div className='w-full'><p className='text-xs text-red-500 font-semibold'>*Your password or email was incorrect. Please check your password.</p></div>
+                  <div className='w-full'><p className='text-xs font-semibold text-red-500'>*Your password or email was incorrect. Please check your password.</p></div>
                 )
               }
               <button
@@ -134,13 +134,18 @@ const Login = () => {
               >
                 Log in
               </button>
+              <div className='flex items-center justify-center w-full my-4'>
+                <hr  className='h-1 bg-grey-color1'/>
+                <span className='text-sm font-semibold text-grey-color2'>OR</span>
+                <hr  className='h-1 bg-grey-color1'/>
+              </div>
             </form>
           </div>
           <div className='w-[350px] border-[1px] border-grey-color3 flex items-center justify-center gap-2 p-8'>
             <span className='text-grey-color2'>Don't have any account?</span>
             <span
               onClick={() => navigate('/signup')}
-              className='text-blue-600 hover:text-blue-800 font-semibold cursor-pointer'
+              className='font-semibold text-blue-600 cursor-pointer hover:text-blue-800'
             >
               Sign Up
             </span>
