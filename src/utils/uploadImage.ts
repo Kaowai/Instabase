@@ -1,5 +1,5 @@
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
-import { storage } from '../config'
+import { storage } from '../FirebaseConfig'
 import { Post } from '../models/post.model'
 
 export const uploadImage = async (imageFiles: File[]): Promise<string[]> => {

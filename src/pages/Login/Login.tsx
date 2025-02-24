@@ -7,7 +7,10 @@ import { useNavigate } from 'react-router-dom'
 import phone1 from './../../assets/mockuphome.png'
 import phone2 from './../../assets/mockupexplore.png'
 import fbIc from './../../assets/icons8-facebook.svg'
-import { ClipLoader, FadeLoader } from 'react-spinners'
+import { ClipLoader } from 'react-spinners'
+import { signInWithPopup } from 'firebase/auth'
+import { auth, provider } from './../../FirebaseConfig'
+
 interface LoginInput {
   email: string
   password: string
@@ -43,6 +46,16 @@ const Login = () => {
       setIsCheckingAuth(false) // Cho phép hiển thị form login
     }
   }, [])
+
+  const handleFacebookLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
   const onSubmit = async (data: LoginInput): Promise<void> => {
     setLoading(true)
@@ -140,19 +153,22 @@ const Login = () => {
                 disabled={isLoginError || Object.keys(errors).length > 0}
                 className={`text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3 disabled:cursor-default ${!loading && 'hover:bg-blue-600'} transition-all`}
               >
-                {loading ? <ClipLoader size={12} color='white'/> : ' Log in'}
-              </button>
-              <div className='flex items-center justify-center w-full gap-4 my-4'>
-                <div className='w-full h-[0.5px] bg-grey-color1' />
-                <span className='text-sm font-semibold text-grey-color2'>OR</span>
-                <div className='w-full h-[0.5px] bg-grey-color1' />
-              </div>
-
-              <button className='flex items-center justify-center w-full gap-1 my-3 text-base font-semibold transition-all text-fb-color hover:text-blue-600'>
-                <img src={fbIc} className='w-10 h-10' />
-                Login with Facebook
+                {loading ? <ClipLoader size={12} color='white' /> : ' Log in'}
               </button>
             </form>
+            <div className='flex items-center justify-center w-full gap-4 my-2'>
+              <div className='w-full h-[0.5px] bg-grey-color1' />
+              <span className='text-sm font-semibold text-grey-color2'>OR</span>
+              <div className='w-full h-[0.5px] bg-grey-color1' />
+            </div>
+
+            <button
+              onClick={handleFacebookLogin}
+              className='flex items-center justify-center w-full gap-1 mb-6 text-base font-semibold transition-all text-fb-color hover:text-blue-600'
+            >
+              <img src={fbIc} className='w-8 h-8' />
+              Login with Facebook
+            </button>
           </div>
           <div className='w-[350px] md:border-[1px] md:border-grey-color3 flex items-center justify-center gap-2 p-8'>
             <span className='text-grey-color2'>Don't have any account?</span>
