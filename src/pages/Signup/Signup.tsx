@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
 import { loginService, setNameAndAvatarService, setNickNameUserService, signUpService } from '../../apis/authService'
+import { ClipLoader } from 'react-spinners'
 
 const schema = yup.object().shape({
   email: yup.string().email().required('Email is required').trim(),
@@ -104,15 +105,15 @@ const Signup = () => {
       )
     }
   return (
-    <div className='w-screen flex flex-col gap-6 justify-center mt-4 items-center'>
+    <div className='flex flex-col items-center justify-center w-screen gap-6 mt-4'>
       <div className='w-[350px] h-full border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
         {/* Logo */}
-        <div className=' flex h-20 mt-8 justify-center items-center w-full'>
+        <div className='flex items-center justify-center w-full h-20 mt-8 '>
           <span className='logo'>Instagram</span>
         </div>
 
         {/* Title */}
-        <div className='flex justify-center items-center w-full'>
+        <div className='flex items-center justify-center w-full'>
           <span className='text-center font-semibold text-grey-color2 text-[1.1rem]'>
             Sign up to see photos and videos from your friends.
           </span>
@@ -121,7 +122,7 @@ const Signup = () => {
         {/* Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className='py-4 flex w-full justify-center items-center flex-col gap-2 '
+          className='flex flex-col items-center justify-center w-full gap-2 py-4 '
         >
           <div className='w-full'>
             <input
@@ -178,10 +179,10 @@ const Signup = () => {
             />
             {errors.userName && <p className='errors'>{errors.userName.message}</p>}
           </div>
-          {isSignupError && (<p className='errors w-full'>{error}</p>)}
-          <div className='w-full justify-start flex items-start gap-2 mt-1 flex-col'>
+          {isSignupError && (<p className='w-full errors'>{error}</p>)}
+          <div className='flex flex-col items-start justify-start w-full gap-2 mt-1'>
             <div className='flex items-start gap-2'>
-              <p className='text-center font-light text-sm text-gray-600'>
+              <p className='text-sm font-light text-center text-gray-600'>
                 By sign up, you agree to our Terms, Privacy Policy and Cookies Policy .
               </p>
             </div>
@@ -190,9 +191,11 @@ const Signup = () => {
           <button
             type='submit'
             disabled={loading || Object.keys(errors).length > 0}
-            className='text-white font-bold text-sm disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3'
+            className='w-full p-2 mt-3 text-sm font-bold text-white transition-all bg-blue-500 rounded-md outline-none hover:bg-blue-700 disabled:bg-blue-300'
           >
-            Sign Up
+            {
+              loading ? <ClipLoader size={12} color='white'/> : 'Sign up'
+            }
           </button>
         </form>
       </div>
@@ -200,7 +203,7 @@ const Signup = () => {
         <span className='text-grey-color2'>Already have an account?</span>
         <span
           onClick={() => navigate('/login')}
-          className='text-blue-600 hover:text-blue-800 font-semibold cursor-pointer'
+          className='font-semibold text-blue-600 cursor-pointer hover:text-blue-800'
         >
           Log in
         </span>

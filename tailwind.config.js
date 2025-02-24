@@ -15,7 +15,8 @@ export default {
         'grey-color2': '#848484',
         'grey-color3': '#dbdbdb',
         'grey-color4': '#efefef',
-        'blue-color': '#3797f0'
+        'blue-color': '#3797f0',
+        'fb-color': '#039BE5',
       },
       backgroundImage: {
         'custom-gradient': 'linear-gradient(90deg, #f9ce34, #ee2a7b, #6228d7)'
