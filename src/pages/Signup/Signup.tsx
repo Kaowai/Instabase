@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
 import { loginService, setNameAndAvatarService, setNickNameUserService, signUpService } from '../../apis/authService'
 import { ClipLoader } from 'react-spinners'
+import fbIc from './../../assets/icons8-facebook.svg'
+import fbIcWhite from './../../assets/icon-facebook-white.svg'
 
 const schema = yup.object().shape({
   email: yup.string().email().required('Email is required').trim(),
@@ -68,45 +70,44 @@ const Signup = () => {
 
   const onSubmit = async (data: SignupInput): Promise<void> => {
     const defaultImage =
-      "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
-  
+      'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg'
+
     try {
-      setLoading(true);
-  
+      setLoading(true)
+
       // Đăng ký tài khoản
-      const user = await signUpService(data.email, data.password);
-  
+      const user = await signUpService(data.email, data.password)
+
       // Cập nhật thông tin người dùng (chạy song song)
       await Promise.all([
         setNameAndAvatarService(user.userId, data.fullName, defaultImage),
-        setNickNameUserService(user.userId, data.userName),
-      ]);
-  
+        setNickNameUserService(user.userId, data.userName)
+      ])
+
       // Đăng nhập và lấy thông tin
-      const loginData = await loginService(data.email, data.password);
+      const loginData = await loginService(data.email, data.password)
       sessionStorage.setItem('user', JSON.stringify(loginData))
-      
     } catch (err) {
-      setError((err?.detail as string) || "Register failed");
+      setError((err?.detail as string) || 'Register failed')
       setIsSignupError(true)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
   const onFocus = () => {
     setIsSignupError(false)
   }
 
-    if (isCheckingAuth) {
-      return (
-        <div className='flex items-center justify-center h-screen'>
-          <p>Loading...</p>
-        </div>
-      )
-    }
+  if (isCheckingAuth) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <p>Loading...</p>
+      </div>
+    )
+  }
   return (
-    <div className='flex flex-col items-center justify-center w-screen gap-6 mt-4'>
-      <div className='w-[350px] h-full border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8'>
+    <div className='flex flex-col items-center justify-center w-screen gap-4 mt-4'>
+      <div className='w-[350px] h-full border-[1px] border-grey-color3 flex items-center flex-col gap-2 px-8 pb-6'>
         {/* Logo */}
         <div className='flex items-center justify-center w-full h-20 mt-8 '>
           <span className='logo'>Instagram</span>
@@ -117,6 +118,17 @@ const Signup = () => {
           <span className='text-center font-semibold text-grey-color2 text-[1.1rem]'>
             Sign up to see photos and videos from your friends.
           </span>
+        </div>
+
+        <button className='flex items-center justify-center w-full gap-2 py-1 my-2 text-base font-semibold text-white transition-all rounded-lg bg-fb-color hover:bg-blue-600'>
+          <img src={fbIcWhite} className='w-8 h-8' />
+          Login with Facebook
+        </button>
+
+        <div className='flex items-center justify-center w-full gap-4 py-1'>
+          <div className='w-full h-[0.5px] bg-grey-color1' />
+          <span className='text-sm font-semibold text-grey-color2'>OR</span>
+          <div className='w-full h-[0.5px] bg-grey-color1' />
         </div>
 
         {/* Form */}
@@ -179,31 +191,29 @@ const Signup = () => {
             />
             {errors.userName && <p className='errors'>{errors.userName.message}</p>}
           </div>
-          {isSignupError && (<p className='w-full errors'>{error}</p>)}
+          {isSignupError && <p className='w-full errors'>{error}</p>}
           <div className='flex flex-col items-start justify-start w-full gap-2 mt-1'>
             <div className='flex items-start gap-2'>
-              <p className='text-sm font-light text-center text-gray-600'>
+              <p className='text-sm font-light text-center text-black'>
                 By sign up, you agree to our Terms, Privacy Policy and Cookies Policy .
               </p>
             </div>
           </div>
-          
+
           <button
             type='submit'
             disabled={loading || Object.keys(errors).length > 0}
-            className='w-full p-2 mt-3 text-sm font-bold text-white transition-all bg-blue-500 rounded-md outline-none hover:bg-blue-700 disabled:bg-blue-300'
+            className='w-full p-2 mt-3 font-semibold text-white transition-all bg-blue-500 rounded-md outline-none hover:bg-blue-600 disabled:bg-blue-300'
           >
-            {
-              loading ? <ClipLoader size={12} color='white'/> : 'Sign up'
-            }
+            {loading ? <ClipLoader size={12} color='white' /> : 'Sign up'}
           </button>
         </form>
       </div>
-      <div className='w-[350px] border-[1px] border-grey-color3 flex items-center justify-center gap-2 p-8'>
+      <div className='w-[350px] border-[1px] border-grey-color3 flex items-center justify-center gap-2 p-6'>
         <span className='text-grey-color2'>Already have an account?</span>
         <span
           onClick={() => navigate('/login')}
-          className='font-semibold text-blue-600 cursor-pointer hover:text-blue-800'
+          className='font-semibold cursor-pointer text-fb-color hover:text-blue-800'
         >
           Log in
         </span>

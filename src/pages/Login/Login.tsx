@@ -138,7 +138,7 @@ const Login = () => {
               <button
                 type='submit'
                 disabled={isLoginError || Object.keys(errors).length > 0}
-                className={`text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3 disabled:cursor-default ${!loading && 'hover:bg-blue-700'} transition-all`}
+                className={`text-white font-semibold disabled:bg-blue-300 w-full bg-blue-500 rounded-md outline-none p-2 mt-3 disabled:cursor-default ${!loading && 'hover:bg-blue-600'} transition-all`}
               >
                 {loading ? <ClipLoader size={12} color='white'/> : ' Log in'}
               </button>
@@ -148,7 +148,7 @@ const Login = () => {
                 <div className='w-full h-[0.5px] bg-grey-color1' />
               </div>
 
-              <button className='flex items-center justify-center w-full gap-1 my-3 text-base font-semibold transition-all text-fb-color hover:text-blue-900'>
+              <button className='flex items-center justify-center w-full gap-1 my-3 text-base font-semibold transition-all text-fb-color hover:text-blue-600'>
                 <img src={fbIc} className='w-10 h-10' />
                 Login with Facebook
               </button>
@@ -158,7 +158,7 @@ const Login = () => {
             <span className='text-grey-color2'>Don't have any account?</span>
             <span
               onClick={() => navigate('/signup')}
-              className='font-semibold text-blue-600 cursor-pointer hover:text-blue-800'
+              className='font-semibold cursor-pointer text-fb-color hover:text-blue-600'
             >
               Sign Up
             </span>
